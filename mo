@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# This is a partial rewrite supporting Bash 5+ only.
+#
 #/ Mo is a mustache template rendering software written in bash.  It inserts
 #/ environment variables into templates.
 #/
@@ -115,8 +117,6 @@ mo() (
     moDoubleHyphens=false
     MO_OPEN_DELIMITER_DEFAULT="{{"
     MO_CLOSE_DELIMITER_DEFAULT="}}"
-    MO_FUNCTION_CACHE_HIT=()
-    MO_FUNCTION_CACHE_MISS=()
 
     if [[ $# -gt 0 ]]; then
         for arg in "$@"; do
@@ -205,7 +205,7 @@ mo() (
         done
     fi
 
-    mo::debug "Debug enabled"
+    #mo::debug "Debug enabled"
     MO_OPEN_DELIMITER="$MO_OPEN_DELIMITER_DEFAULT"
     MO_CLOSE_DELIMITER="$MO_CLOSE_DELIMITER_DEFAULT"
     mo::content moContent ${moFiles[@]+"${moFiles[@]}"} || return 1
@@ -238,32 +238,32 @@ mo::debugShowState() {
    
     local moState moTemp moIndex moDots
 
-    mo::escape moTemp "$MO_OPEN_DELIMITER"
+    moTemp=${MO_OPEN_DELIMITER@Q}
     moState="open: $moTemp"
-    mo::escape moTemp "$MO_CLOSE_DELIMITER"
+    moTemp=${MO_CLOSE_DELIMITER@Q}
     moState="$moState  close: $moTemp"
-    mo::escape moTemp "$MO_STANDALONE_CONTENT"
+    moTemp=${MO_STANDALONE_CONTENT@Q}
     moState="$moState  standalone: $moTemp"
-    mo::escape moTemp "$MO_CURRENT"
+    moTemp=${MO_CURRENT@Q}
     moState="$moState  current: $moTemp"
     moIndex=$((${#MO_PARSED} - 20))
     moDots=...
 
-    if [[ "$moIndex" -lt 0 ]]; then
+    if (( moIndex < 0 )); then
         moIndex=0
         moDots=
     fi
 
-    mo::escape moTemp "${MO_PARSED:$moIndex}"
+    moTemp=${MO_PARSED:moIndex@Q}
     moState="$moState  parsed: $moDots$moTemp"
 
     moDots=...
     
-    if [[ "${#MO_UNPARSED}" -le 20 ]]; then
+    if (( ${#MO_UNPARSED} <= 20 )); then
         moDots=
     fi
 
-    mo::escape moTemp "${MO_UNPARSED:0:20}$moDots"
+    moTemp=${MO_UNPARSED:0:20@Q}
     moState="$moState  unparsed: $moTemp"
 
     echo "DEBUG ${FUNCNAME[1]:-?} - $moState" >&2
@@ -333,12 +333,12 @@ mo::content() {
 
     if [[ "${#@}" -gt 0 ]]; then
         for moFilename in "$@"; do
-            mo::debug "Using template to load content from file: $moFilename"
+            #mo::debug "Using template to load content from file: $moFilename"
             #: This is so relative paths work from inside template files
             moContent="$moContent$MO_OPEN_DELIMITER>$moFilename$MO_CLOSE_DELIMITER"
         done
     else
-        mo::debug "Will read content from stdin"
+        #mo::debug "Will read content from stdin"
         mo::contentFile moContent || return 1
     fi
     
@@ -362,7 +362,7 @@ mo::contentFile() {
     moFile=${2:-/dev/stdin}
 
     if [[ -e "$moFile" ]]; then
-        mo::debug "Loading content: $moFile"
+        #mo::debug "Loading content: $moFile"
         moContent=$(
             set +Ee
             cat -- "$moFile"
@@ -374,7 +374,7 @@ mo::contentFile() {
     elif [[ -n "${MO_FAIL_ON_FILE-}" ]]; then
         mo::error "No such file: $moFile"
     else
-        mo::debug "File does not exist: $moFile"
+        #mo::debug "File does not exist: $moFile"
         moContent=""
     fi
 
@@ -418,13 +418,13 @@ mo::indirect() {
 #
 # Returns nothing.
 mo::indirectArray() {
-    unset -v "$1"
-
-    #: IFS must be set to a string containing space or unset in order for
-    #: the array slicing to work regardless of the current IFS setting on
-    #: bash 3.  This is detailed further at
-    #: https://github.com/fidian/gg-core/pull/7
-    eval "$(printf "IFS= %s=(\"\${@:2}\") IFS=%q" "$1" "$IFS")"
+    local varname=$1
+    shift
+    unset -v "$varname"
+    
+    #: Use nameref in Bash 5 to set the array
+    local -n ref=$varname
+    ref=("$@")
 }
 
 
@@ -432,18 +432,9 @@ mo::indirectArray() {
 #
 # Returns nothing.
 mo::trimUnparsed() {
-    local moI moC
-
-    moI=0
-    moC=${MO_UNPARSED:0:1}
-
-    while [[ "$moC" == " " || "$moC" == $'\r' || "$moC" == $'\n' || "$moC" == $'\t' ]]; do
-        moI=$((moI + 1))
-        moC=${MO_UNPARSED:$moI:1}
-    done
-
-    if [[ "$moI" != 0 ]]; then
-        MO_UNPARSED=${MO_UNPARSED:$moI}
+    #: Use regex with =~ for faster matching in Bash 5
+    if [[ $MO_UNPARSED =~ ^[[:space:]]+ ]]; then
+        MO_UNPARSED=${MO_UNPARSED#${BASH_REMATCH[0]}}
     fi
 }
 
@@ -489,7 +480,7 @@ mo::parse() {
     #: is after the tag up to the next newline. If that is the case, remove
     #: whitespace and the trailing newline. By setting this to $'\n', we're
     #: saying we are at the beginning of content.
-    mo::debug "Starting parse of ${#2} bytes"
+    #mo::debug "Starting parse of ${#2} bytes"
     moOldParsed=${MO_PARSED:-}
     moOldUnparsed=${MO_UNPARSED:-}
     MO_PARSED=""
@@ -525,10 +516,10 @@ mo::parse() {
 mo::parseInternal() {
     local moChunk
 
-    mo::debug "Starting parse"
+    #mo::debug "Starting parse"
 
     while [[ -n "$MO_UNPARSED" ]]; do
-        mo::debugShowState
+        #mo::debugShowState
         moChunk=${MO_UNPARSED%%"$MO_OPEN_DELIMITER"*}
         MO_PARSED="$MO_PARSED$moChunk"
         MO_STANDALONE_CONTENT="$MO_STANDALONE_CONTENT$moChunk"
@@ -601,7 +592,7 @@ mo::parseBlock() {
     mo::tokenizeTagContents moTokens "$MO_CLOSE_DELIMITER"
     MO_UNPARSED=${MO_UNPARSED#"$MO_CLOSE_DELIMITER"}
     mo::tokensToString moTokensString "${moTokens[@]:1}"
-    mo::debug "Parsing block: $moTokensString"
+    #mo::debug "Parsing block: $moTokensString"
 
     if mo::standaloneCheck; then
         mo::standaloneProcess
@@ -630,7 +621,7 @@ mo::parseBlockFunction() {
     moTokensString=$2
     shift 2
     moTokens=(${@+"$@"})
-    mo::debug "Parsing block function: $moTokensString"
+    #mo::debug "Parsing block function: $moTokensString"
     mo::getContentUntilClose moTemp "$moTokensString"
     #: Pass unparsed content to the function.
     #: Keep the updated delimiters if they changed.
@@ -640,7 +631,7 @@ mo::parseBlockFunction() {
         MO_PARSED="$MO_PARSED$moResult"
     fi
 
-    mo::debug "Done parsing block function: $moTokensString"
+    #mo::debug "Done parsing block function: $moTokensString"
 }
 
 
@@ -657,14 +648,20 @@ mo::parseBlockArray() {
     moTokensString=$2
     shift 2
     moTokens=(${@+"$@"})
-    mo::debug "Parsing block array: $moTokensString"
+    #mo::debug "Parsing block array: $moTokensString"
     moOpenDelimiterBefore=$MO_OPEN_DELIMITER
     moCloseDelimiterBefore=$MO_CLOSE_DELIMITER
     mo::getContentUntilClose moTemp "$moTokensString"
     moOpenDelimiterAfter=$MO_OPEN_DELIMITER
     moCloseDelimiterAfter=$MO_CLOSE_DELIMITER
     moArrayName=${moTokens[1]}
-    eval "moArrayIndexes=(\"\${!${moArrayName}[@]}\")"
+    
+    if declare -p "$moArrayName" &>/dev/null; then
+        local -n arrayRef=$moArrayName
+        moArrayIndexes=("${!arrayRef[@]}")
+    else
+        moArrayIndexes=()
+    fi
     
     if [[ "${#moArrayIndexes[@]}" -lt 1 ]]; then
         #: No elements
@@ -689,7 +686,7 @@ mo::parseBlockArray() {
                 MO_CLOSE_DELIMITER=$moCloseDelimiterBefore
                 moCurrent=$MO_CURRENT
                 MO_CURRENT=$moArrayName.$moArrayIndex
-                mo::debug "Iterate over array using element: $MO_CURRENT"
+                #mo::debug "Iterate over array using element: $MO_CURRENT"
                 mo::parse moParsed "$moTemp" "blockArray$MO_STANDALONE_CONTENT"
                 MO_CURRENT=$moCurrent
                 MO_PARSED="$MO_PARSED$moParsed"
@@ -701,7 +698,7 @@ mo::parseBlockArray() {
 
     MO_OPEN_DELIMITER=$moOpenDelimiterAfter
     MO_CLOSE_DELIMITER=$moCloseDelimiterAfter
-    mo::debug "Done parsing block array: $moTokensString"
+    #mo::debug "Done parsing block array: $moTokensString"
 }
 
 
@@ -718,7 +715,7 @@ mo::parseBlockValue() {
     moTokensString=$2
     shift 2
     moTokens=(${@+"$@"})
-    mo::debug "Parsing block value: $moTokensString"
+    #mo::debug "Parsing block value: $moTokensString"
     moOpenDelimiterBefore=$MO_OPEN_DELIMITER
     moCloseDelimiterBefore=$MO_CLOSE_DELIMITER
     mo::getContentUntilClose moTemp "$moTokensString"
@@ -729,7 +726,7 @@ mo::parseBlockValue() {
     mo::evaluateListOfSingles moResult "${moTokens[@]}"
 
     if mo::isTruthy "$moResult" "$moInvertBlock"; then
-        mo::debug "Block is truthy: $moResult"
+        #mo::debug "Block is truthy: $moResult"
         #: Restore the delimiter before parsing
         MO_OPEN_DELIMITER=$moOpenDelimiterBefore
         MO_CLOSE_DELIMITER=$moCloseDelimiterBefore
@@ -742,7 +739,7 @@ mo::parseBlockValue() {
 
     MO_OPEN_DELIMITER=$moOpenDelimiterAfter
     MO_CLOSE_DELIMITER=$moCloseDelimiterAfter
-    mo::debug "Done parsing block value: $moTokensString"
+    #mo::debug "Done parsing block value: $moTokensString"
 }
 
 
@@ -777,11 +774,11 @@ mo::parsePartial() {
             moIndentation=
         fi
 
-        mo::debug "Adding indentation to partial: '$moIndentation'"
+        #mo::debug "Adding indentation to partial: '$moIndentation'"
         mo::standaloneProcess
     fi
 
-    mo::debug "Parsing partial: $moFilename"
+    #mo::debug "Parsing partial: $moFilename"
 
     #: Execute in subshell to preserve current cwd and environment
     moResult=$(
@@ -807,7 +804,7 @@ mo::parsePartial() {
     ) || exit 1
 
     if [[ -z "$moResult" ]]; then
-        mo::debug "Error detected when trying to read the file"
+        #mo::debug "Error detected when trying to read the file"
         exit 1
     fi
 
@@ -824,7 +821,7 @@ mo::parseComment() {
     local moContent moContent
 
     MO_UNPARSED=${MO_UNPARSED#*"$MO_CLOSE_DELIMITER"}
-    mo::debug "Parsing comment"
+    #mo::debug "Parsing comment"
 
     if mo::standaloneCheck; then
         mo::standaloneProcess
@@ -847,7 +844,7 @@ mo::parseDelimiter() {
     mo::trimUnparsed
     mo::chomp moClose "${MO_UNPARSED%%="$MO_CLOSE_DELIMITER"*}"
     MO_UNPARSED=${MO_UNPARSED#*="$MO_CLOSE_DELIMITER"}
-    mo::debug "Parsing delimiters: $moOpen $moClose"
+    #mo::debug "Parsing delimiters: $moOpen $moClose"
 
     if mo::standaloneCheck; then
         mo::standaloneProcess
@@ -887,58 +884,10 @@ mo::parseValue() {
 #
 # $1 - Function name to check
 #
-# Be extremely careful.  Even if strict mode is enabled, it is not honored
-# in newer versions of Bash.  Any errors that crop up here will not be
-# caught automatically.
-#
-# Examples
-#
-#   moo () {
-#       echo "This is a function"
-#   }
-#   if mo::isFunction moo; then
-#       echo "moo is a defined function"
-#   fi
-#
 # Returns 0 if the name is a function, 1 otherwise.
 mo::isFunction() {
-    local moFunctionName
-
-    # Need to test for the array length, otherwise Mac will report an
-    # unbound variable
-    if [[ "${#MO_FUNCTION_CACHE_HIT[@]}" -gt 0 ]]; then
-        for moFunctionName in "${MO_FUNCTION_CACHE_HIT[@]}"; do
-            if [[ "$moFunctionName" == "$1" ]]; then
-                return 0
-            fi
-        done
-    fi
-
-    if [[ "${#MO_FUNCTION_CACHE_MISS[@]}" -gt 0 ]]; then
-        for moFunctionName in "${MO_FUNCTION_CACHE_MISS[@]}"; do
-            if [[ "$moFunctionName" == "$1" ]]; then
-                return 1
-            fi
-        done
-    fi
-
-    if declare -F "$1" &> /dev/null; then
-        if [[ "${#MO_FUNCTION_CACHE_HIT[@]}" -gt 0 ]]; then
-            MO_FUNCTION_CACHE_HIT=( ${MO_FUNCTION_CACHE_HIT[@]+"${MO_FUNCTION_CACHE_HIT[@]}"} "$1" )
-        else
-            MO_FUNCTION_CACHE_HIT=( "$1" )
-        fi
-
-        return 0
-    fi
-
-    if [[ "${#MO_FUNCTION_CACHE_MISS[@]}" -gt 0 ]]; then
-        MO_FUNCTION_CACHE_MISS=( ${MO_FUNCTION_CACHE_MISS[@]+"${MO_FUNCTION_CACHE_MISS[@]}"} "$1" )
-    else
-        MO_FUNCTION_CACHE_MISS=( "$1" )
-    fi
-
-    return 1
+    #: Use declare -F directly with parameter expansion in Bash 5
+    declare -F "$1" > /dev/null 2>&1
 }
 
 
@@ -946,18 +895,6 @@ mo::isFunction() {
 # an array.
 #
 # $1 - Name of environment variable
-#
-# Be extremely careful.  Even if strict mode is enabled, it is not honored
-# in newer versions of Bash.  Any errors that crop up here will not be
-# caught automatically.
-#
-# Examples
-#
-#   var=(abc)
-#   if moIsArray var; then
-#      echo "This is an array"
-#      echo "Make sure you don't accidentally use \$var"
-#   fi
 #
 # Returns 0 if the name is not empty, 1 otherwise.
 mo::isArray() {
@@ -984,7 +921,7 @@ mo::isArray() {
 mo::isArrayIndexValid() {
     local moDeclare moTest
 
-    moDeclare=$(declare -p "$1")
+    moDeclare=$(declare -p "$1" 2>/dev/null) || return 1
     moTest=""
 
     if [[ "${moDeclare:0:10}" == "declare -a" ]]; then
@@ -993,11 +930,13 @@ mo::isArrayIndexValid() {
         #: will appear like it worked.
         if [[ "$2" == "0" ]] || [[ "$2" =~ ^[1-9][0-9]*$ ]]; then
             #: Index looks like a number
-            eval "moTest=\"\${$1[$2]+ok}\""
+            local -n arrayRef=$1
+            moTest=${arrayRef[$2]+ok}
         fi
     elif [[ "${moDeclare:0:10}" == "declare -A" ]]; then
         #: Associative array
-        eval "moTest=\"\${$1[$2]+ok}\""
+        local -n arrayRef=$1
+        moTest=${arrayRef[$2]+ok}
     fi
 
     if [[ -n "$moTest" ]]; then
@@ -1016,50 +955,14 @@ mo::isArrayIndexValid() {
 # Can not use logic like this in case invalid variable names are passed.
 #     [[ "${!1-a}" == "${!1-b}" ]]
 #
-# Using logic like this gives false positives. Also, this is not supported on
-# Bash 3.2 and the script parsing will error before any commands are executed.
-#     [[ -v "$a" ]]
-#
-# Declaring a variable is not the same as assigning the variable.
-#     export x
-#     declare -p x   # Output: declare -x x
-#                    # Bash 3.2 returns error code 1 and outputs:
-#                    # bash: declare: x: not found
-#     export y=""
-#     declare -p y   # Output: declare -x y=""
-#     unset z
-#     declare -p z   # Error code 1 and output: bash: declare: z: not found
-#
 # Returns true (0) if the variable is set, 1 if the variable is unset.
-MO_VAR_TEST="ok"
-
-# This must not use `[[` because otherwise Bash 3.2 will stop execution and
-# always write to stderr without the ability to capture it.
-if test -v "MO_VAR_TEST" &> /dev/null; then
-    mo::debug "Using declare -p and [[ -v ]] for variable checks"
-    # More recent Bash
-    mo::isVarSet() {
-        # Do not convert this to [[, otherwise Bash 3.2 will fail to parse the
-        # script.
-        if declare -p "$1" &> /dev/null && test -v "$1"; then
-            return 0
-        fi
-
+mo::isVarSet() {
+    if ! declare -p "$1" &> /dev/null; then
         return 1
-    }
-else
-    mo::debug "Using declare -p for variable checks"
-    # Bash 3.2
-    mo::isVarSet() {
-        # If the variable is exported and not assigned, declare -p will error.
-        if declare -p "$1" &> /dev/null; then
-            return 0
-        fi
+    fi
 
-        return 1
-    }
-fi
-unset MO_VAR_TEST
+    return 0
+}
 
 
 # Internal: Determine if a value is considered truthy.
@@ -1086,11 +989,11 @@ mo::isTruthy() {
     #: false     false    false
     #: false     true     true
     if [[ "$moTruthy" == "$2" ]]; then
-        mo::debug "Value is falsy, test result: $moTruthy inverse: $2"
+        #mo::debug "Value is falsy, test result: $moTruthy inverse: $2"
         return 1
     fi
 
-    mo::debug "Value is truthy, test result: $moTruthy inverse: $2"
+    #mo::debug "Value is truthy, test result: $moTruthy inverse: $2"
     return 0
 }
 
@@ -1119,7 +1022,7 @@ mo::evaluate() {
             PAREN|BRACE)
                 moType=$1
                 moValue=$2
-                mo::debug "Combining $moValue tokens"
+                #mo::debug "Combining $moValue tokens"
                 moIndex=$((${#moStack[@]} - (2 * moValue)))
                 mo::evaluateListOfSingles moCombined "${moStack[@]:$moIndex}"
 
@@ -1142,11 +1045,11 @@ mo::evaluate() {
     if [[ "${moStack[0]:-}" == "NAME" ]] && mo::isFunction "${moStack[1]}"; then
         #: Special case - if the first argument is a function, then the rest are
         #: passed to the function.
-        mo::debug "Evaluating function: ${moStack[1]}"
+        #mo::debug "Evaluating function: ${moStack[1]}"
         mo::evaluateFunction moResult "" "${moStack[@]:1}"
     else
         #: Concatenate
-        mo::debug "Concatenating ${#moStack[@]} stack items"
+        #mo::debug "Concatenating ${#moStack[@]} stack items"
         mo::evaluateListOfSingles moResult ${moStack[@]+"${moStack[@]}"}
     fi
 
@@ -1180,7 +1083,7 @@ mo::evaluateListOfSingles() {
         shift 2
     done
 
-    mo::debug "Evaluated list of singles: $moResult"
+    #mo::debug "Evaluated list of singles: $moResult"
 
     local "$moTarget" && mo::indirect "$moTarget" "$moResult"
 }
@@ -1198,7 +1101,7 @@ mo::evaluateSingle() {
 
     moType=$2
     moArg=$3
-    mo::debug "Evaluating $moType: $moArg ($MO_CURRENT)"
+    #mo::debug "Evaluating $moType: $moArg ($MO_CURRENT)"
 
     if [[ "$moType" == "VALUE" ]]; then
         moResult=$moArg
@@ -1246,22 +1149,24 @@ mo::evaluateVariable() {
     moArg=$2
     moResult=""
     mo::findVariableName moNameParts "$moArg"
-    mo::debug "Evaluate variable ($moArg, $MO_CURRENT): ${moNameParts[*]}"
+    #mo::debug "Evaluate variable ($moArg, $MO_CURRENT): ${moNameParts[*]}"
 
     if [[ -z "${moNameParts[1]}" ]]; then
         if mo::isArray "${moNameParts[0]}"; then
-            eval mo::join moResult "," "\${${moNameParts[0]}[@]}"
+            local -n arrayRef=${moNameParts[0]}
+            mo::join moResult "," "${arrayRef[@]}"
         else
             if mo::isVarSet "${moNameParts[0]}"; then
-                moResult=${moNameParts[0]}
-                moResult="${!moResult}"
+                local -n varRef=${moNameParts[0]}
+                moResult=$varRef
             elif [[ -n "${MO_FAIL_ON_UNSET-}" ]]; then
                 mo::error "Environment variable not set: ${moNameParts[0]}"
             fi
         fi
     else
         if mo::isArray "${moNameParts[0]}"; then
-            eval "set +u;moResult=\"\${${moNameParts[0]}[${moNameParts[1]%%.*}]}\""
+            local -n arrayRef=${moNameParts[0]}
+            moResult=${arrayRef[${moNameParts[1]%%.*}]}
         else
             mo::error "Unable to index a scalar as an array: $moArg"
         fi
@@ -1312,12 +1217,12 @@ mo::findVariableName() {
             moResultIndex=${MO_CURRENT#*.}
         fi
     elif [[ "$moVar" == *.* ]]; then
-        mo::debug "Find variable name; name has dot: $moVar"
+        #mo::debug "Find variable name; name has dot: $moVar"
         moResultBase=${moVar%%.*}
         moResultIndex=${moVar#*.}
     elif [[ -n "$MO_CURRENT" ]]; then
         moCurrent=${MO_CURRENT%%.*}
-        mo::debug "Find variable name; look in array: $moCurrent"
+        #mo::debug "Find variable name; look in array: $moCurrent"
 
         if mo::isArrayIndexValid "$moCurrent" "$moVar"; then
             moResultBase=$moCurrent
@@ -1375,20 +1280,24 @@ mo::evaluateFunction() {
         shift 2
     done
 
-    mo::escape moFunctionCall "$moFunction"
+    moFunctionCall=$moFunction
+    
+    #: Quote special characters in function name
+    if [[ "$moFunction" =~ [^a-zA-Z0-9_:-] ]]; then
+        moFunctionCall=${moFunction@Q}
+    fi
 
     if [[ -n "${MO_ALLOW_FUNCTION_ARGUMENTS-}" ]]; then
-        mo::debug "Function arguments are allowed"
+        #mo::debug "Function arguments are allowed"
 
         if [[ ${#moArgs[@]} -gt 0 ]]; then
             for moTemp in "${moArgs[@]}"; do
-                mo::escape moTemp "$moTemp"
-                moFunctionCall="$moFunctionCall $moTemp"
+                moFunctionCall="$moFunctionCall ${moTemp@Q}"
             done
         fi
     fi
 
-    mo::debug "Calling function: $moFunctionCall"
+    #mo::debug "Calling function: $moFunctionCall"
 
     #: Call the function in a subshell for safety. Employ the trick to preserve
     #: whitespace at the end of the output.
@@ -1427,7 +1336,7 @@ mo::standaloneCheck() {
     MO_STANDALONE_CONTENT=""
 
     if [[ "$moContent" != *"$moN"* ]]; then
-        mo::debug "Not a standalone tag - no newline before"
+        #mo::debug "Not a standalone tag - no newline before"
 
         return 1
     fi
@@ -1437,7 +1346,7 @@ mo::standaloneCheck() {
     moContent=${moContent// /}
 
     if [[ -n "$moContent" ]]; then
-        mo::debug "Not a standalone tag - non-whitespace detected before tag"
+        #mo::debug "Not a standalone tag - non-whitespace detected before tag"
 
         return 1
     fi
@@ -1449,7 +1358,7 @@ mo::standaloneCheck() {
     moContent=${moContent// /}
 
     if [[ -n "$moContent" ]]; then
-        mo::debug "Not a standalone tag - non-whitespace detected after tag"
+        #mo::debug "Not a standalone tag - non-whitespace detected after tag"
 
         return 1
     fi
@@ -1471,14 +1380,13 @@ mo::standaloneCheck() {
 mo::standaloneProcess() {
     local moI moTemp
 
-    mo::debug "Standalone tag - processing content before and after tag"
+    #mo::debug "Standalone tag - processing content before and after tag"
     moI=$((${#MO_PARSED} - 1))
-    mo::debug "zero done ${#MO_PARSED}"
+    #mo::debug "zero done ${#MO_PARSED}"
     mo::escape moTemp "$MO_PARSED"
-    mo::debug "$moTemp"
+    #mo::debug "$moTemp"
 
-    # Mac appears to allow getting characters from before the start of the string
-    while [[ "$moI" -ge 0 ]] && [[ "${MO_PARSED:$moI:1}" == " " || "${MO_PARSED:$moI:1}" == $'\t' ]]; do
+    while [[ "${MO_PARSED:$moI:1}" == " " || "${MO_PARSED:$moI:1}" == $'\t' ]]; do
         moI=$((moI - 1))
     done
 
@@ -1520,14 +1428,14 @@ mo::indentLines() {
     moContent=$3
 
     if [[ -z "$moIndentation" ]]; then
-        mo::debug "Not applying indentation, empty indentation"
+        #mo::debug "Not applying indentation, empty indentation"
 
         local "$1" && mo::indirect "$1" "$moContent"
         return
     fi
 
     if [[ -z "$moContent" ]]; then
-        mo::debug "Not applying indentation, empty contents"
+        #mo::debug "Not applying indentation, empty contents"
 
         local "$1" && mo::indirect "$1" "$moContent"
         return
@@ -1537,7 +1445,7 @@ mo::indentLines() {
     moN=$'\n'
     moR=$'\r'
 
-    mo::debug "Applying indentation: '${moIndentation}'"
+    #mo::debug "Applying indentation: '${moIndentation}'"
 
     while [[ -n "$moContent" ]]; do
         moChunk=${moContent%%"$moN"*}
@@ -1587,7 +1495,7 @@ mo::getContentUntilClose() {
 
     moTarget=$1
     moTagStack=("$2")
-    mo::debug "Get content until close tag: ${moTagStack[0]}"
+    #mo::debug "Get content until close tag: ${moTagStack[0]}"
     moResult=""
 
     while [[ -n "$MO_UNPARSED" ]] && [[ "${#moTagStack[@]}" -gt 0 ]]; do
@@ -1600,7 +1508,7 @@ mo::getContentUntilClose() {
             MO_UNPARSED=${MO_UNPARSED:${#MO_OPEN_DELIMITER}}
             mo::getContentTrim moTemp
             moResultTemp="$moResultTemp$moTemp"
-            mo::debug "First character within tag: ${MO_UNPARSED:0:1}"
+            #mo::debug "First character within tag: ${MO_UNPARSED:0:1}"
 
             case "$MO_UNPARSED" in
                 '#'*)
@@ -1724,16 +1632,15 @@ mo::tokensToString() {
 #
 # Returns nothing.
 mo::getContentTrim() {
-    local moChar moResult
+    local moResult
     
-    moChar=${MO_UNPARSED:0:1}
-    moResult=""
-
-    while [[ "$moChar" == " " ]] || [[ "$moChar" == $'\r' ]] || [[ "$moChar" == $'\t' ]] || [[ "$moChar" == $'\n' ]]; do
-        moResult="$moResult$moChar"
-        MO_UNPARSED=${MO_UNPARSED:1}
-        moChar=${MO_UNPARSED:0:1}
-    done
+    #: Use =~ regex matching for faster whitespace trimming
+    if [[ $MO_UNPARSED =~ ^[[:space:]]+ ]]; then
+        moResult=${BASH_REMATCH[0]}
+        MO_UNPARSED=${MO_UNPARSED#${BASH_REMATCH[0]}}
+    else
+        moResult=""
+    fi
 
     local "$1" && mo::indirect "$1" "$moResult"
 }
@@ -1747,7 +1654,7 @@ mo::getContentTrim() {
 mo::getContentComment() {
     local moResult
 
-    mo::debug "Getting content for comment"
+    #mo::debug "Getting content for comment"
     moResult=${MO_UNPARSED%%"$MO_CLOSE_DELIMITER"*}
     MO_UNPARSED=${MO_UNPARSED:${#moResult}}
 
@@ -1769,7 +1676,7 @@ mo::getContentComment() {
 mo::getContentDelimiter() {
     local moResult moTemp moOpen moClose
 
-    mo::debug "Getting content for delimiter"
+    #mo::debug "Getting content for delimiter"
     moResult=""
     mo::getContentTrim moTemp
     moResult="$moResult$moTemp"
@@ -1836,7 +1743,7 @@ mo::tokenizeTagContents() {
     moResult=()
     moUnparsedOriginal=$MO_UNPARSED
     moTokenCount=0
-    mo::debug "Tokenizing tag contents until terminator: $moTerminator"
+    #mo::debug "Tokenizing tag contents until terminator: $moTerminator"
 
     while true; do
         mo::trimUnparsed
@@ -1847,7 +1754,7 @@ mo::tokenizeTagContents() {
                 ;;
 
             "$moTerminator"*)
-                mo::debug "Found terminator"
+                #mo::debug "Found terminator"
                 local "$1" && mo::indirectArray "$1" "$moTokenCount" ${moResult[@]+"${moResult[@]}"}
                 return
                 ;;
@@ -1888,7 +1795,7 @@ mo::tokenizeTagContents() {
                 ;;
         esac
 
-        mo::debug "Got chunk: ${moTemp[0]} ${moTemp[1]}"
+        #mo::debug "Got chunk: ${moTemp[0]} ${moTemp[1]}"
         moTokenCount=$((moTokenCount + 1))
     done
 }
@@ -1909,7 +1816,7 @@ mo::tokenizeTagContentsName() {
     moTemp=${moTemp%%\}*}
     MO_UNPARSED=${MO_UNPARSED:${#moTemp}}
     mo::trimUnparsed
-    mo::debug "Parsed default token: $moTemp"
+    #mo::debug "Parsed default token: $moTemp"
 
     local "$1" && mo::indirectArray "$1" "NAME" "$moTemp"
 }
@@ -1927,7 +1834,7 @@ mo::tokenizeTagContentsDoubleQuote() {
     moUnparsedOriginal=$MO_UNPARSED
     MO_UNPARSED=${MO_UNPARSED:1}
     moResult=
-    mo::debug "Getting double quoted tag contents"
+    #mo::debug "Getting double quoted tag contents"
 
     while true; do
         if [[ -z "$MO_UNPARSED" ]]; then
@@ -2003,7 +1910,7 @@ mo::tokenizeTagContentsSingleQuote() {
     moUnparsedOriginal=$MO_UNPARSED
     MO_UNPARSED=${MO_UNPARSED:1}
     moResult=
-    mo::debug "Getting single quoted tag contents"
+    #mo::debug "Getting single quoted tag contents"
 
     while true; do
         if [[ -z "$MO_UNPARSED" ]]; then
@@ -2028,7 +1935,7 @@ mo::tokenizeTagContentsSingleQuote() {
 
 # Save the original command's path for usage later
 MO_ORIGINAL_COMMAND="$(cd "${BASH_SOURCE[0]%/*}" || exit 1; pwd)/${BASH_SOURCE[0]##*/}"
-MO_VERSION="3.1.0"
+MO_VERSION="3.0.6"
 
 # If sourced, load all functions.
 # If executed, perform the actions as expected.
