@@ -446,16 +446,8 @@ mo::trimUnparsed() {
 #
 # Returns nothing.
 mo::chomp() {
-    local moTemp moR moN moT
-
-    moR=$'\r'
-    moN=$'\n'
-    moT=$'\t'
-    moTemp=${2%% *}
-    moTemp=${moTemp%%"$moR"*}
-    moTemp=${moTemp%%"$moN"*}
-    moTemp=${moTemp%%"$moT"*}
-
+    #: Use single pattern substitution for faster processing in Bash 5
+    local moTemp=${2%%[[:space:]]*}
     local "$1" && mo::indirect "$1" "$moTemp"
 }
 
@@ -753,7 +745,7 @@ mo::parseBlockValue() {
 #
 # Returns nothing
 mo::parsePartial() {
-    local moFilename moResult moIndentation moN moR moTemp moT
+    local moFilename moResult moIndentation
 
     MO_UNPARSED=${MO_UNPARSED:1}
     mo::trimUnparsed
@@ -762,17 +754,10 @@ mo::parsePartial() {
     moIndentation=""
 
     if mo::standaloneCheck; then
-        moN=$'\n'
-        moR=$'\r'
-        moT=$'\t'
-        moIndentation="$moN${MO_PARSED//"$moR"/"$moN"}"
-        moIndentation=${moIndentation##*"$moN"}
-        moTemp=${moIndentation// }
-        moTemp=${moTemp//"$moT"}
+        moIndentation=$'\n'"${MO_PARSED//$'\r'/$'\n'}"
+        moIndentation=${moIndentation##*$'\n'}
 
-        if [[ -n "$moTemp" ]]; then
-            moIndentation=
-        fi
+        [[ ${moIndentation//[[:blank:]]/} ]] && moIndentation=
 
         mo::debug "Adding indentation to partial: '$moIndentation'"
         mo::standaloneProcess
