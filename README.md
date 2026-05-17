@@ -23,7 +23,7 @@ This bash version supports conditionals, functions (both as filters and as value
 Requirements
 ------------
 
-* Bash 3.x (the aim is to make it work on Macs)
+* Bash 5.x
 * The "coreutils" package (`basename` and `cat`)
 * ... that's it.  Why?  Because bash **can**!
 
