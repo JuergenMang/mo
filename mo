@@ -1480,11 +1480,8 @@ mo::indentLines() {
 # Returns nothing
 mo::escape() {
     local moResult
-
     moResult=$2
-    moResult=$(declare -p moResult)
-    moResult=${moResult#*=}
-
+    moResult=${moResult@Q} 
     local "$1" && mo::indirect "$1" "$moResult"
 }
 
