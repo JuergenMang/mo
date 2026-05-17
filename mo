@@ -510,8 +510,8 @@ mo::parseInternal() {
     while [[ -n "$MO_UNPARSED" ]]; do
         mo::debugShowState
         moChunk=${MO_UNPARSED%%"$MO_OPEN_DELIMITER"*}
-        MO_PARSED="$MO_PARSED$moChunk"
-        MO_STANDALONE_CONTENT="$MO_STANDALONE_CONTENT$moChunk"
+        MO_PARSED+="$moChunk"
+        MO_STANDALONE_CONTENT+="$moChunk"
         MO_UNPARSED=${MO_UNPARSED:${#moChunk}}
 
         if [[ -n "$MO_UNPARSED" ]]; then
@@ -617,7 +617,7 @@ mo::parseBlockFunction() {
 
     if [[ "$moInvertBlock" != "true" ]]; then
         mo::evaluateFunction moResult "$moTemp" "${moTokens[@]:1}"
-        MO_PARSED="$MO_PARSED$moResult"
+        MO_PARSED+="$moResult"
     fi
 
     mo::debug "Done parsing block function: $moTokensString"
@@ -662,7 +662,7 @@ mo::parseBlockArray() {
             MO_CURRENT=$moArrayName
             mo::parse moParsed "$moTemp" "blockArrayInvert$MO_STANDALONE_CONTENT"
             MO_CURRENT=$moCurrent
-            MO_PARSED="$MO_PARSED$moParsed"
+            MO_PARSED+="$moParsed"
         fi
     else
         if [[ "$moInvertBlock" != "true" ]]; then
@@ -678,7 +678,7 @@ mo::parseBlockArray() {
                 mo::debug "Iterate over array using element: $MO_CURRENT"
                 mo::parse moParsed "$moTemp" "blockArray$MO_STANDALONE_CONTENT"
                 MO_CURRENT=$moCurrent
-                MO_PARSED="$MO_PARSED$moParsed"
+                MO_PARSED+="$moParsed"
             done
 
             MO_UNPARSED=$moUnparsed
@@ -722,7 +722,7 @@ mo::parseBlockValue() {
         moCurrent=$MO_CURRENT
         MO_CURRENT=${moTokens[1]}
         mo::parse moParsed "$moTemp" "blockValue$MO_STANDALONE_CONTENT"
-        MO_PARSED="$MO_PARSED$moParsed"
+        MO_PARSED+="$moParsed"
         MO_CURRENT=$moCurrent
     fi
 
@@ -790,7 +790,7 @@ mo::parsePartial() {
         exit 1
     fi
 
-    MO_PARSED="$MO_PARSED${moResult%.}"
+    MO_PARSED+="${moResult%.}"
 }
 
 
@@ -848,7 +848,7 @@ mo::parseValue() {
     moUnparsedOriginal=$MO_UNPARSED
     mo::tokenizeTagContents moTokens "$MO_CLOSE_DELIMITER"
     mo::evaluate moResult "${moTokens[@]:1}"
-    MO_PARSED="$MO_PARSED$moResult"
+    MO_PARSED+="$moResult"
 
     if [[ "${MO_UNPARSED:0:${#MO_CLOSE_DELIMITER}}" != "$MO_CLOSE_DELIMITER" ]]; then
         mo::errorNear "Did not find closing tag" "$moUnparsedOriginal"
@@ -1061,7 +1061,7 @@ mo::evaluateListOfSingles() {
 
     while [[ $# -gt 1 ]]; do
         mo::evaluateSingle moTemp "$1" "$2"
-        moResult="$moResult$moTemp"
+        moResult+="$moTemp"
         shift 2
     done
 
@@ -1240,7 +1240,7 @@ mo::join() {
     shift 3
 
     for part in "$@"; do
-        result="$result$joiner$part"
+        result+="$joiner$part"
     done
 
     local "$target" && mo::indirect "$target" "$result"
