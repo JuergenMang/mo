@@ -1,6 +1,8 @@
 Mo - Mustache Templates in Bash
 ===============================
 
+**HINT:** This fork of MO does support only Bash5+.
+
 [Mustache] templates are simple, logic-less templates.  Because of their simplicity, they are able to be ported to many languages.  The syntax is quite simple.
 
     Hello, {{NAME}}.
