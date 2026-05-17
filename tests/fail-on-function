@@ -8,6 +8,6 @@ failFunction() {
 export arguments=(--fail-on-function)
 export returnCode=1
 export template="Fail on function? {{failFunction}}"
-export expected=$'ERROR: Function failed with status code 1: "failFunction"\n'
+export expected=$'ERROR: Function failed with status code 1: failFunction\n'
 
 runTest
