@@ -1386,7 +1386,7 @@ mo::standaloneCheck() {
 #
 # Returns nothing.
 mo::standaloneProcess() {
-    local moI moTemp
+    local moI moTemp moChar
 
     #mo::debug "Standalone tag - processing content before and after tag"
     moI=$((${#MO_PARSED} - 1))
@@ -1394,7 +1394,7 @@ mo::standaloneProcess() {
     mo::escape moTemp "$MO_PARSED"
     #mo::debug "$moTemp"
 
-    while [[ "${MO_PARSED:$moI:1}" == " " || "${MO_PARSED:$moI:1}" == $'\t' ]]; do
+    while moChar="${MO_PARSED:$moI:1}" && [[ "$moChar" == " " || "$moChar" == $'\t' ]]; do
         moI=$((moI - 1))
     done
 
@@ -1404,15 +1404,17 @@ mo::standaloneProcess() {
 
     moI=0
 
-    while [[ "${MO_UNPARSED:${moI}:1}" == " " || "${MO_UNPARSED:${moI}:1}" == $'\t' ]]; do
+    while moChar="${MO_UNPARSED:${moI}:1}" && [[ "$moChar" == " " || "$moChar" == $'\t' ]]; do
         moI=$((moI + 1))
     done
 
-    if [[ "${MO_UNPARSED:${moI}:1}" == $'\r' ]]; then
+    moChar="${MO_UNPARSED:${moI}:1}"
+    if [[ "$moChar" == $'\r' ]]; then
         moI=$((moI + 1))
+        moChar="${MO_UNPARSED:${moI}:1}"
     fi
 
-    if [[ "${MO_UNPARSED:${moI}:1}" == $'\n' ]]; then
+    if [[ "$moChar" == $'\n' ]]; then
         moI=$((moI + 1))
     fi
 
@@ -1768,7 +1770,7 @@ mo::tokenizeTagContents() {
                 #: Do not tokenize the open paren - treat this as RPL
                 MO_UNPARSED=${MO_UNPARSED:1}
                 mo::tokenizeTagContents moTemp ')'
-                moResult=(${moResult[@]+"${moResult[@]}"} "${moTemp[@]:1}" PAREN "${moTemp[0]}")
+                moResult+=("${moTemp[@]:1}" PAREN "${moTemp[0]}")
                 MO_UNPARSED=${MO_UNPARSED:1}
                 ;;
 
@@ -1776,7 +1778,7 @@ mo::tokenizeTagContents() {
                 #: Do not tokenize the open brace - treat this as RPL
                 MO_UNPARSED=${MO_UNPARSED:1}
                 mo::tokenizeTagContents moTemp '}'
-                moResult=(${moResult[@]+"${moResult[@]}"} "${moTemp[@]:1}" BRACE "${moTemp[0]}")
+                moResult+=("${moTemp[@]:1}" BRACE "${moTemp[0]}")
                 MO_UNPARSED=${MO_UNPARSED:1}
                 ;;
 
@@ -1786,17 +1788,17 @@ mo::tokenizeTagContents() {
 
             "'"*)
                 mo::tokenizeTagContentsSingleQuote moTemp
-                moResult=(${moResult[@]+"${moResult[@]}"} "${moTemp[@]}")
+                moResult+=("${moTemp[@]}")
                 ;;
 
             '"'*)
                 mo::tokenizeTagContentsDoubleQuote moTemp
-                moResult=(${moResult[@]+"${moResult[@]}"} "${moTemp[@]}")
+                moResult+=("${moTemp[@]}")
                 ;;
 
             *)
                 mo::tokenizeTagContentsName moTemp
-                moResult=(${moResult[@]+"${moResult[@]}"} "${moTemp[@]}")
+                moResult+=("${moTemp[@]}")
                 ;;
         esac
 
