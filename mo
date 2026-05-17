@@ -220,9 +220,8 @@ mo() (
 #
 # Returns nothing.
 mo::debug() {
-    if [[ -n "${MO_DEBUG:-}" ]]; then
-        echo "DEBUG ${FUNCNAME[1]:-?} - $1" >&2
-    fi
+    [[ -z ${MO_DEBUG-} ]] && return
+    echo "DEBUG ${FUNCNAME[1]:-?} - $1" >&2
 }
 
 
@@ -232,9 +231,7 @@ mo::debug() {
 #
 # Returns nothing.
 mo::debugShowState() {
-    if [[ -z "${MO_DEBUG:-}" ]]; then
-        return
-    fi
+    [[ -z "${MO_DEBUG:-}" ]] && return
    
     local moState moTemp moIndex moDots
 
