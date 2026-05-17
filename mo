@@ -1158,7 +1158,11 @@ mo::evaluateVariable() {
         else
             if mo::isVarSet "${moNameParts[0]}"; then
                 local -n varRef=${moNameParts[0]}
-                moResult=$varRef
+                if [[ -z "${varRef-}" ]]; then
+                    moResult=""
+                else
+                    moResult=$varRef
+                fi
             elif [[ -n "${MO_FAIL_ON_UNSET-}" ]]; then
                 mo::error "Environment variable not set: ${moNameParts[0]}"
             fi
@@ -1166,7 +1170,11 @@ mo::evaluateVariable() {
     else
         if mo::isArray "${moNameParts[0]}"; then
             local -n arrayRef=${moNameParts[0]}
-            moResult=${arrayRef[${moNameParts[1]%%.*}]}
+            if [[ -z "${arrayRef-}" ]]; then
+                moResult=""
+            else
+                moResult=${arrayRef[${moNameParts[1]%%.*}]}
+            fi
         else
             mo::error "Unable to index a scalar as an array: $moArg"
         fi
@@ -1935,7 +1943,7 @@ mo::tokenizeTagContentsSingleQuote() {
 
 # Save the original command's path for usage later
 MO_ORIGINAL_COMMAND="$(cd "${BASH_SOURCE[0]%/*}" || exit 1; pwd)/${BASH_SOURCE[0]##*/}"
-MO_VERSION="3.0.6"
+MO_VERSION="3.1.0"
 
 # If sourced, load all functions.
 # If executed, perform the actions as expected.
