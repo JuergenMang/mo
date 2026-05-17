@@ -1,0 +1,28 @@
+{
+    "xxxx" : [
+        {
+            "x" : "xxxx",
+            "xx" : [
+                {{#ARRAY_JSON_CHARACTERSET}}
+                    {{MO_COMMA_IF_NOT_FIRST}}
+                    {
+                        "xxxx" : {{.}},
+                        "xxxx" : "{{.}}"
+                    }
+                {{/ARRAY_JSON_CHARACTERSET}}
+            ]
+        },
+        {
+            "x" : "xxxx",
+            "xx" : [
+                {{#ARRAY_XML_CHARACTERSET}}
+                    {{MO_COMMA_IF_NOT_FIRST}}
+                    {
+                        "xxxx" : {{.}},
+                        "xxxx" : "{{.}}"
+                    }
+                {{/ARRAY_XML_CHARACTERSET}}
+            ]
+        }
+    ]
+}

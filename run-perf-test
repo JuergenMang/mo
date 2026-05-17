@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Runs a performance tests
+#
+
+cd "perf-tests" || exit 1
+. ../mo
+
+mapfile -t ARRAY_JSON_CHARACTERSET < JSON_CHARACTERSET.array
+mapfile -t ARRAY_XML_CHARACTERSET < XML_CHARACTERSET.array
+
+time mo template.json
