@@ -1316,52 +1316,19 @@ mo::evaluateFunction() {
 #
 # Returns 0 if this is a standalone tag, 1 otherwise.
 mo::standaloneCheck() {
-    local moContent moN moR moT
+    local moContent=${MO_STANDALONE_CONTENT//$'\r'/$'\n'}
 
-    moN=$'\n'
-    moR=$'\r'
-    moT=$'\t'
+    MO_STANDALONE_CONTENT=
 
-    #: Check the content before
-    moContent=${MO_STANDALONE_CONTENT//"$moR"/"$moN"}
+    [[ $moContent == *$'\n'* ]] || return 1
+    [[ ${moContent##*$'\n'} =~ ^[[:blank:]]*$ ]] || return 1
 
-    #: By default, signal to the next check that this one failed
-    MO_STANDALONE_CONTENT=""
+    moContent=${MO_UNPARSED//$'\r'/$'\n'}
+    [[ ${moContent%%$'\n'*} =~ ^[[:blank:]]*$ ]] || return 1
 
-    if [[ "$moContent" != *"$moN"* ]]; then
-        mo::debug "Not a standalone tag - no newline before"
-
-        return 1
-    fi
-
-    moContent=${moContent##*"$moN"}
-    moContent=${moContent//"$moT"/}
-    moContent=${moContent// /}
-
-    if [[ -n "$moContent" ]]; then
-        mo::debug "Not a standalone tag - non-whitespace detected before tag"
-
-        return 1
-    fi
-
-    #: Check the content after
-    moContent=${MO_UNPARSED//"$moR"/"$moN"}
-    moContent=${moContent%%"$moN"*}
-    moContent=${moContent//"$moT"/}
-    moContent=${moContent// /}
-
-    if [[ -n "$moContent" ]]; then
-        mo::debug "Not a standalone tag - non-whitespace detected after tag"
-
-        return 1
-    fi
-
-    #: Signal to the next check that this tag removed content
     MO_STANDALONE_CONTENT=$'\n'
-
     return 0
 }
-
 
 # Internal: Process content before and after a tag. Remove prior whitespace up
 # to the previous newline. Remove following whitespace up to and including the
@@ -1425,14 +1392,16 @@ mo::indentLines() {
     if [[ -z "$moIndentation" ]]; then
         mo::debug "Not applying indentation, empty indentation"
 
-        local "$1" && mo::indirect "$1" "$moContent"
+        #local "$1" && mo::indirect "$1" "$moContent"
+        printf -v "$1" '%s' "$moContent"
         return
     fi
 
     if [[ -z "$moContent" ]]; then
         mo::debug "Not applying indentation, empty contents"
 
-        local "$1" && mo::indirect "$1" "$moContent"
+        #local "$1" && mo::indirect "$1" "$moContent"
+        printf -v "$1" '%s' "$moContent"
         return
     fi
 
@@ -1455,7 +1424,8 @@ mo::indentLines() {
         moContent=${moContent:1}
     done
 
-    local "$1" && mo::indirect "$1" "$moResult"
+    #local "$1" && mo::indirect "$1" "$moResult"
+    printf -v "$1" '%s' "$moResult"
 }
 
 
