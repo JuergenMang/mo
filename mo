@@ -1170,7 +1170,7 @@ mo::evaluateVariable() {
     else
         if mo::isArray "${moNameParts[0]}"; then
             local -n arrayRef=${moNameParts[0]}
-            if [[ -z "${arrayRef-}" ]]; then
+            if [[ -z "${arrayRef[*]}" ]]; then
                 moResult=""
             else
                 moResult=${arrayRef[${moNameParts[1]%%.*}]}
