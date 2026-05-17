@@ -884,9 +884,9 @@ mo::isArray() {
     local moTestResult
 
     moTestResult=$(declare -p "$1" 2>/dev/null) || return 1
-    [[ "${moTestResult:0:10}" == "declare -a" ]] && return 0
-    [[ "${moTestResult:0:10}" == "declare -A" ]] && return 0
-
+    case "${moTestResult:0:10}" in
+        "declare -a"|"declare -A") return 0 ;;
+    esac
     return 1
 }
 
