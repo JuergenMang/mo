@@ -429,6 +429,9 @@ mo::indirectArray() {
 #
 # Returns nothing.
 mo::trimUnparsed() {
+    # fast path
+    [[ ${MO_UNPARSED:0:1} != ' ' && ${MO_UNPARSED:0:1} != $'\t' ]] && return
+
     #: Use regex with =~ for faster matching in Bash 5
     if [[ $MO_UNPARSED =~ ^[[:space:]]+ ]]; then
         MO_UNPARSED=${MO_UNPARSED#${BASH_REMATCH[0]}}
@@ -1232,18 +1235,16 @@ mo::findVariableName() {
 #
 # Returns nothing.
 mo::join() {
-    local joiner part result target
+    local target joiner
 
     target=$1
     joiner=$2
-    result=$3
-    shift 3
+    shift 2
 
-    for part in "$@"; do
-        result+="$joiner$part"
-    done
+    local IFS="$joiner"
+    local result="$*"
 
-    local "$target" && mo::indirect "$target" "$result"
+    printf -v "$target" '%s' "$result"
 }
 
 
