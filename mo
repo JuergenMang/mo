@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 #
-# This is a partial rewrite supporting Bash 5+ only.
-#
 #/ Mo is a mustache template rendering software written in bash.  It inserts
 #/ environment variables into templates.
 #/
@@ -90,6 +88,9 @@
 #/ This is open source!  Please feel free to contribute.
 #/
 #/ https://github.com/tests-always-included/mo
+#/
+#/ This is a partial rewrite supporting Bash 5+ only.
+#/ https://github.com/JuergenMang/mo
 
 #: Disable these warnings for the entire file
 #:
@@ -1923,7 +1924,7 @@ mo::tokenizeTagContentsSingleQuote() {
 
 # Save the original command's path for usage later
 MO_ORIGINAL_COMMAND="$(cd "${BASH_SOURCE[0]%/*}" || exit 1; pwd)/${BASH_SOURCE[0]##*/}"
-MO_VERSION="3.1.0"
+MO_VERSION="5.0.0"
 
 # If sourced, load all functions.
 # If executed, perform the actions as expected.
