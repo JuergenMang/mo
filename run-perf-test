@@ -5,6 +5,8 @@
 
 cd "perf-tests" || exit 1
 . ../mo
+. functions.sh
+
 
 mapfile -t ARRAY_JSON_CHARACTERSET < JSON_CHARACTERSET.array
 mapfile -t ARRAY_XML_CHARACTERSET < XML_CHARACTERSET.array
