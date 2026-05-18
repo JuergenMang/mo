@@ -771,26 +771,24 @@ mo::parsePartial() {
 
     #: Execute in subshell to preserve current cwd and environment
     moResult=$(
-        #: It would be nice to remove `dirname` and use a function instead,
-        #: but that is difficult when only given filenames.
         cd "$(dirname -- "$moFilename")" || exit 1
-        echo "$(
-            local moPartialContent moPartialParsed
 
-            if ! mo::contentFile moPartialContent "${moFilename##*/}"; then
-                exit 1
-            fi
+        local moPartialContent moPartialParsed
 
-            #: Reset delimiters before parsing
-            mo::indentLines moPartialContent "$moIndentation" "$moPartialContent"
-            MO_OPEN_DELIMITER="$MO_OPEN_DELIMITER_DEFAULT"
-            MO_CLOSE_DELIMITER="$MO_CLOSE_DELIMITER_DEFAULT"
-            mo::parse moPartialParsed "$moPartialContent"
+        if ! mo::contentFile moPartialContent "${moFilename##*/}"; then
+            exit 1
+        fi
 
-            #: Fix bash handling of subshells and keep trailing whitespace.
-            printf '%s' "$moPartialParsed."
-        )" || exit 1
+        mo::indentLines moPartialContent "$moIndentation" "$moPartialContent"
+
+        MO_OPEN_DELIMITER="$MO_OPEN_DELIMITER_DEFAULT"
+        MO_CLOSE_DELIMITER="$MO_CLOSE_DELIMITER_DEFAULT"
+
+        mo::parse moPartialParsed "$moPartialContent"
+
+        printf '%s.' "$moPartialParsed"
     ) || exit 1
+
 
     if [[ -z "$moResult" ]]; then
         mo::debug "Error detected when trying to read the file"
