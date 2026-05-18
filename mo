@@ -1298,7 +1298,7 @@ mo::evaluateFunction() {
 
     while [[ $# -gt 1 ]]; do
         mo::evaluateSingle moTemp "$1" "$2"
-        moArgs=(${moArgs[@]+"${moArgs[@]}"} "$moTemp")
+        moArgs+=("$moTemp")
         shift 2
     done
 
@@ -1324,7 +1324,7 @@ mo::evaluateFunction() {
     #: Call the function in a subshell for safety. Employ the trick to preserve
     #: whitespace at the end of the output.
     moContent=$(
-        export MO_FUNCTION_ARGS=(${moArgs[@]+"${moArgs[@]}"})
+        export MO_FUNCTION_ARGS=("${moArgs[@]}")
         printf '%s' "$moContent" | eval "$moFunctionCall ; moFunctionResult=\$? ; printf '.' ; exit \"\$moFunctionResult\""
     ) || {
         moFunctionResult=$?
