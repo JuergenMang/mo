@@ -1498,37 +1498,37 @@ mo::getContentUntilClose() {
             moResultTemp="$MO_OPEN_DELIMITER"
             MO_UNPARSED=${MO_UNPARSED:${#MO_OPEN_DELIMITER}}
             mo::getContentTrim moTemp
-            moResultTemp="$moResultTemp$moTemp"
+            moResultTemp+="$moTemp"
             mo::debug "First character within tag: ${MO_UNPARSED:0:1}"
 
             case "$MO_UNPARSED" in
                 '#'*)
                     #: Increase block
-                    moResultTemp="$moResultTemp${MO_UNPARSED:0:1}"
+                    moResultTemp+="{MO_UNPARSED:0:1}"
                     MO_UNPARSED=${MO_UNPARSED:1}
                     mo::getContentTrim moTemp
                     mo::getContentWithinTag moTemp "$MO_CLOSE_DELIMITER"
-                    moResultTemp="$moResultTemp${moTemp[0]}"
+                    moResultTemp+="${moTemp[0]}"
                     moTagStack=("${moTemp[1]}" "${moTagStack[@]}")
                     ;;
 
                 '^'*)
                     #: Increase block
-                    moResultTemp="$moResultTemp${MO_UNPARSED:0:1}"
+                    moResultTemp+="{MO_UNPARSED:0:1}"
                     MO_UNPARSED=${MO_UNPARSED:1}
                     mo::getContentTrim moTemp
                     mo::getContentWithinTag moTemp "$MO_CLOSE_DELIMITER"
-                    moResultTemp="$moResultTemp${moTemp[0]}"
+                    moResultTemp+="{moTemp[0]}"
                     moTagStack=("${moTemp[1]}" "${moTagStack[@]}")
                     ;;
 
                 '>'*)
                     #: Partial - ignore
-                    moResultTemp="$moResultTemp${MO_UNPARSED:0:1}"
+                    moResultTemp+="${MO_UNPARSED:0:1}"
                     MO_UNPARSED=${MO_UNPARSED:1}
                     mo::getContentTrim moTemp
                     mo::getContentWithinTag moTemp "$MO_CLOSE_DELIMITER"
-                    moResultTemp="$moResultTemp${moTemp[0]}"
+                    moResultTemp+="${moTemp[0]}"
                     ;;
 
                 '/'*)
@@ -1539,7 +1539,7 @@ mo::getContentUntilClose() {
                     mo::getContentWithinTag moTemp "$MO_CLOSE_DELIMITER"
                     
                     if [[ "${moTagStack[0]}" == "${moTemp[1]}" ]]; then
-                        moResultTemp="$moResultTemp${moTemp[0]}"
+                        moResultTemp+="${moTemp[0]}"
                         moTagStack=("${moTagStack[@]:1}")
 
                         if [[ "${#moTagStack[@]}" -eq 0 ]]; then
@@ -1554,33 +1554,33 @@ mo::getContentUntilClose() {
                 '!'*)
                     #: Comment - ignore
                     mo::getContentComment moTemp
-                    moResultTemp="$moResultTemp$moTemp"
+                    moResultTemp+="$moTemp"
                     ;;
 
                 '='*)
                     #: Change delimiters
                     mo::getContentDelimiter moTemp
-                    moResultTemp="$moResultTemp$moTemp"
+                    moResultTemp+="$moTemp"
                     ;;
 
                 '&'*)
                     #: Unescaped - bypass one then ignore
-                    moResultTemp="$moResultTemp${MO_UNPARSED:0:1}"
+                    moResultTemp+="${MO_UNPARSED:0:1}"
                     MO_UNPARSED=${MO_UNPARSED:1}
                     mo::getContentTrim moTemp
-                    moResultTemp="$moResultTemp$moTemp"
+                    moResultTemp+="$moTemp"
                     mo::getContentWithinTag moTemp "$MO_CLOSE_DELIMITER"
-                    moResultTemp="$moResultTemp${moTemp[0]}"
+                    moResultTemp+="${moTemp[0]}"
                     ;;
 
                 *)
                     #: Normal variable - ignore
                     mo::getContentWithinTag moTemp "$MO_CLOSE_DELIMITER"
-                    moResultTemp="$moResultTemp${moTemp[0]}"
+                    moResultTemp+="${moTemp[0]}"
                     ;;
             esac
 
-            moResult="$moResult$moResultTemp"
+            moResult+="$moResultTemp"
         fi
     done
 
