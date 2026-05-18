@@ -636,7 +636,7 @@ mo::parseBlockArray() {
     moInvertBlock=$1
     moTokensString=$2
     shift 2
-    moTokens=(${@+"$@"})
+    moTokens=("$@")
     mo::debug "Parsing block array: $moTokensString"
     moOpenDelimiterBefore=$MO_OPEN_DELIMITER
     moCloseDelimiterBefore=$MO_CLOSE_DELIMITER
@@ -703,7 +703,7 @@ mo::parseBlockValue() {
     moInvertBlock=$1
     moTokensString=$2
     shift 2
-    moTokens=(${@+"$@"})
+    moTokens=("$@")
     mo::debug "Parsing block value: $moTokensString"
     moOpenDelimiterBefore=$MO_OPEN_DELIMITER
     moCloseDelimiterBefore=$MO_CLOSE_DELIMITER
