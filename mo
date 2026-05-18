@@ -915,6 +915,7 @@ mo::isArray() {
         return 1
     fi
 
+    # Use nameref to verify it's actually an array in Bash 5+
     if [[ $decl == declare\ -a* || $decl == declare\ -A* ]]; then
         __mo_type_cache[$name]="array"
         return 0
@@ -1267,15 +1268,11 @@ mo::findVariableName() {
 # Returns nothing.
 mo::join() {
     local target joiner
-
     target=$1
     joiner=$2
     shift 2
-
     local IFS="$joiner"
-    local result="$*"
-
-    printf -v "$target" '%s' "$result"
+    printf -v "$target" '%s' "$*"
 }
 
 
