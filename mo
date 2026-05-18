@@ -871,8 +871,23 @@ mo::parseValue() {
 #
 # Returns 0 if the name is a function, 1 otherwise.
 mo::isFunction() {
-    #: Use declare -F directly with parameter expansion in Bash 5
-    declare -F "$1" > /dev/null 2>&1
+    local name=$1
+    local cached=${__mo_func_cache[$name]:-}
+
+    # Return cached result if known
+    if [[ -n "$cached" ]]; then
+        [[ "$cached" == "1" ]]
+        return
+    fi
+
+    # Perform actual check once
+    if declare -F "$name" > /dev/null 2>&1; then
+        __mo_func_cache[$name]=1
+        return 0
+    else
+        __mo_func_cache[$name]=0
+        return 1
+    fi
 }
 
 
@@ -882,14 +897,28 @@ mo::isFunction() {
 # $1 - Name of environment variable
 #
 # Returns 0 if the name is not empty, 1 otherwise.
-mo::isArray() {
-    #: Namespace this variable so we don't conflict with what we're testing.
-    local moTestResult
 
-    moTestResult=$(declare -p "$1" 2>/dev/null) || return 1
-    case "${moTestResult:0:10}" in
-        "declare -a"|"declare -A") return 0 ;;
-    esac
+mo::isArray() {
+    local name=$1
+    local cached=${__mo_type_cache[$name]:-}
+
+    if [[ -n "$cached" ]]; then
+        [[ "$cached" == "array" ]]
+        return
+    fi
+
+    local decl
+    if ! decl=$(declare -p "$name" 2>/dev/null); then
+        __mo_type_cache[$name]="none"
+        return 1
+    fi
+
+    if [[ $decl == declare\ -a* || $decl == declare\ -A* ]]; then
+        __mo_type_cache[$name]="array"
+        return 0
+    fi
+
+    __mo_type_cache[$name]="scalar"
     return 1
 }
 
@@ -1896,6 +1925,9 @@ mo::tokenizeTagContentsSingleQuote() {
 # Save the original command's path for usage later
 MO_ORIGINAL_COMMAND="$(cd "${BASH_SOURCE[0]%/*}" || exit 1; pwd)/${BASH_SOURCE[0]##*/}"
 MO_VERSION="3.1.0"
+
+declare -A __mo_type_cache
+declare -A __mo_func_cache
 
 # If sourced, load all functions.
 # If executed, perform the actions as expected.
