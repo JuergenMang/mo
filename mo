@@ -78,13 +78,13 @@
 #/ MO_ORIGINAL_COMMAND - Used to find the `mo` program in order to generate a
 #/     help message.
 #/ MO_PARSED - Content that has made it through the template engine.
-#/ MO_STANDALONE_CONTENT - The unparsed content that preceeded the current tag.
+#/ MO_STANDALONE_CONTENT - The unparsed content that preceded the current tag.
 #/     When a standalone tag is encountered, this is checked to see if it only
 #/     contains whitespace. If this and the whitespace condition after a tag is
 #/     met, then this will be reset to $'\n'.
 #/ MO_UNPARSED - Template content yet to make it through the parser.
 #/
-#/ Mo is under a MIT style licence with an additional non-advertising clause.
+#/ Mo is under a MIT style license with an additional non-advertising clause.
 #/ See LICENSE.md for the full text.
 #/
 #/ This is open source!  Please feel free to contribute.
