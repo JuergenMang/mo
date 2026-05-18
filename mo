@@ -210,7 +210,7 @@ mo() (
     MO_CLOSE_DELIMITER="$MO_CLOSE_DELIMITER_DEFAULT"
     mo::content moContent ${moFiles[@]+"${moFiles[@]}"} || return 1
     mo::parse moParsed "$moContent"
-    echo -n "$moParsed"
+    printf '%s' "$moParsed"
 )
 
 
@@ -364,7 +364,7 @@ mo::contentFile() {
             set +Ee
             cat -- "$moFile"
             moResult=$?
-            echo -n '.'
+            printf '.'
             exit "$moResult"
         ) || return 1
         moContent=${moContent%.}  #: Remove last dot
@@ -781,7 +781,7 @@ mo::parsePartial() {
             mo::parse moPartialParsed "$moPartialContent"
 
             #: Fix bash handling of subshells and keep trailing whitespace.
-            echo -n "$moPartialParsed."
+            printf '%s' "$moPartialParsed."
         )" || exit 1
     ) || exit 1
 
@@ -1293,7 +1293,7 @@ mo::evaluateFunction() {
     #: whitespace at the end of the output.
     moContent=$(
         export MO_FUNCTION_ARGS=(${moArgs[@]+"${moArgs[@]}"})
-        echo -n "$moContent" | eval "$moFunctionCall ; moFunctionResult=\$? ; echo -n '.' ; exit \"\$moFunctionResult\""
+        printf '%s' "$moContent" | eval "$moFunctionCall ; moFunctionResult=\$? ; printf '.' ; exit \"\$moFunctionResult\""
     ) || {
         moFunctionResult=$?
         if [[ -n "${MO_FAIL_ON_FUNCTION-}" && "$moFunctionResult" != 0 ]]; then
