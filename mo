@@ -609,7 +609,7 @@ mo::parseBlockFunction() {
     moInvertBlock=$1
     moTokensString=$2
     shift 2
-    moTokens=(${@+"$@"})
+    moTokens=("$@")
     mo::debug "Parsing block function: $moTokensString"
     mo::getContentUntilClose moTemp "$moTokensString"
     #: Pass unparsed content to the function.
