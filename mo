@@ -776,7 +776,6 @@ mo::parsePartial() {
         printf '%s.' "$moPartialParsed"
     ) || exit 1
 
-
     if [[ -z "$moResult" ]]; then
         mo::debug "Error detected when trying to read the file"
         exit 1
