@@ -890,7 +890,6 @@ mo::isFunction() {
 # $1 - Name of environment variable
 #
 # Returns 0 if the name is not empty, 1 otherwise.
-
 mo::isArray() {
     local name=$1
     local cached=${__mo_type_cache[$name]:-}
