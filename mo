@@ -337,7 +337,7 @@ mo::content() {
         for moFilename in "$@"; do
             mo::debug "Using template to load content from file: $moFilename"
             #: This is so relative paths work from inside template files
-            moContent="$moContent$MO_OPEN_DELIMITER>$moFilename$MO_CLOSE_DELIMITER"
+            moContent+="$MO_OPEN_DELIMITER>$moFilename$MO_CLOSE_DELIMITER"
         done
     else
         mo::debug "Will read content from stdin"
@@ -363,16 +363,9 @@ mo::contentFile() {
     #: needs to stay.
     moFile=${2:-/dev/stdin}
 
-    if [[ -e "$moFile" ]]; then
+    if [[ -r "$moFile" ]]; then
         mo::debug "Loading content: $moFile"
-        moContent=$(
-            set +Ee
-            cat -- "$moFile"
-            moResult=$?
-            printf '.'
-            exit "$moResult"
-        ) || return 1
-        moContent=${moContent%.}  #: Remove last dot
+        IFS= read -r -d '' moContent <"$moFile"
     elif [[ -n "${MO_FAIL_ON_FILE-}" ]]; then
         mo::error "No such file: $moFile"
     else
@@ -434,9 +427,6 @@ mo::indirectArray() {
 #
 # Returns nothing.
 mo::trimUnparsed() {
-    # fast path
-    [[ ${MO_UNPARSED:0:1} != ' ' && ${MO_UNPARSED:0:1} != $'\t' ]] && return
-
     #: Use regex with =~ for faster matching in Bash 5
     if [[ $MO_UNPARSED =~ ^[[:space:]]+ ]]; then
         MO_UNPARSED=${MO_UNPARSED#${BASH_REMATCH[0]}}
