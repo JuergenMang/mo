@@ -1,0 +1,2 @@
+# Blocks requests with too long URL
+true

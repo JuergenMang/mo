@@ -1,0 +1,3 @@
+# Inserts the SameSite attribute into cookies from the backend.
+# Valid values: lax, none, none-value, strict
+lax

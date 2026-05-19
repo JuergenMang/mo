@@ -1,0 +1,2 @@
+# Adds the HTTPonly attribute to cookies from the backend.
+false

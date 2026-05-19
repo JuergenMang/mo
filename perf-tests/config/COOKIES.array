@@ -1,0 +1,4 @@
+# Enforcement for specific cookies; a wildcard cookie is always present.
+#name,enforcementType,mask,sameSite,httpOnly
+#cookie1,enforce,true,lax,false
+#cookie2,allow,false,strict,true

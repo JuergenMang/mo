@@ -1,0 +1,32 @@
+# Allows a wildcard and a “no_ext” file type. Remove content to disallow wildcards for file types.
+{
+    "allowed" : true,
+    "checkPostDataLength" : true,
+    "postDataLength" : {{VAR_FILETYPES_WILDCARD_POST_DATA_LENGTH}},
+    "checkQueryStringLength" : true,
+    "queryStringLength" : {{VAR_FILETYPES_WILDCARD_QUERY_STRING_LENGTH}},
+    "checkRequestLength" : true,
+    "requestLength" : {{VAR_FILETYPES_WILDCARD_REQUEST_LENGTH}},
+    "checkUrlLength" : true,
+    "urlLength" : {{VAR_FILETYPES_WILDCARD_URL_LENGTH}},
+    "name" : "*",
+    "performStaging" : false,
+    "responseCheck" : false,
+    "type" : "wildcard",
+    "wildcardOrder" : 1
+},
+{
+    "allowed" : true,
+    "checkPostDataLength" : true,
+    "postDataLength" : {{VAR_FILETYPES_WILDCARD_POST_DATA_LENGTH}},
+    "checkQueryStringLength" : true,
+    "queryStringLength" : {{VAR_FILETYPES_WILDCARD_QUERY_STRING_LENGTH}},
+    "checkRequestLength" : true,
+    "requestLength" : {{VAR_FILETYPES_WILDCARD_REQUEST_LENGTH}},
+    "checkUrlLength" : true,
+    "urlLength" : {{VAR_FILETYPES_WILDCARD_URL_LENGTH}},
+    "name" : "no_ext",
+    "performStaging" : false,
+    "responseCheck" : false,
+    "type" : "explicit"
+}

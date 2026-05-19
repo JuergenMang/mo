@@ -1,0 +1,2 @@
+# Blocks directory traversal requests (e.g., ../ in the URI)
+true

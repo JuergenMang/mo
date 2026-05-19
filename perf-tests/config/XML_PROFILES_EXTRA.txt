@@ -1,0 +1,3 @@
+# Additional XML content profiles.
+# You can use XML_PROFILES_TEMPLATE.inc as template.
+# Must be empty or end with comma.

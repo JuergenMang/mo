@@ -1,0 +1,2 @@
+# Blocks strings with ASCII bytes > 127
+true

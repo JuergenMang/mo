@@ -1,0 +1,2 @@
+# Checks requests for disallowed metacharacters in the URL
+true

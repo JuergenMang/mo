@@ -1,0 +1,3 @@
+# Enforcement mode of the policy, blocking or transparent (log only, no block)
+blocking
+#transparent

@@ -1,0 +1,3 @@
+# Maximum XML document depth for the default XML content profile
+128
+#"any"

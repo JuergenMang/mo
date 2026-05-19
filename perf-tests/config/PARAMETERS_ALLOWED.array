@@ -1,0 +1,3 @@
+# Allowed parameters
+# parameter name, mask, max length, value type, data type, attack signature check, signature ids to be disabled
+password,true,100,user-input,alpha-numeric,true,

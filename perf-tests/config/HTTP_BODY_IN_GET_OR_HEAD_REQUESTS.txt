@@ -1,0 +1,2 @@
+# Blocks GET and HEAD requests with Content-Type header
+true

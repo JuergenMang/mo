@@ -1,0 +1,10 @@
+# Allowed HTTP methods, GET and POST are always allowed
+# Method, actAs (GET or POST) - POST when the request contains a body
+#DELETE,GET
+GET,GET
+HEAD,GET
+OPTIONS,GET
+#PATCH,POST
+POST,POST
+#PUT,POST
+#UPDATE,POST

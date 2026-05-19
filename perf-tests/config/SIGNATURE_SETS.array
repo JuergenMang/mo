@@ -1,0 +1,3 @@
+# Predefined attack signature sets
+#Name,Alarm,Block,Learn
+Generic Detection Signatures (High Accuracy),true,true,true

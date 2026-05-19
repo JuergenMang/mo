@@ -1,0 +1,2 @@
+# Blocks too long query strings
+true

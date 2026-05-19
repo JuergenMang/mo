@@ -1,0 +1,2 @@
+# Maximum request size, must be at least as large as FILETYPES_WILDCARD_POST_DATA_LENGTH.
+52428800

@@ -1,0 +1,5 @@
+# JSON response body for blocking, must be a valid json string
+{
+  \"supportID\": \"<%TS.request.ID()%>\",
+  \"response_type\": \"<%TS.response_type()%>\"
+}

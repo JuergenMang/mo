@@ -1,0 +1,2 @@
+# Allows introspection queries for the default GraphQL profile (security risk)
+false

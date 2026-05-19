@@ -1,0 +1,2 @@
+# Maximum size of a cookie header
+6144

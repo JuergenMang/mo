@@ -1,0 +1,2 @@
+# Masks the cookie contents in the log.
+false

@@ -1,0 +1,8 @@
+# GraphQL response body for blocking
+{
+    \"errors\": [
+        {
+            \"message\": \"The requested query was rejected. Please consult with your administrator. Your support ID is: <%TS.request.ID()%>\"
+        }
+    ]
+}

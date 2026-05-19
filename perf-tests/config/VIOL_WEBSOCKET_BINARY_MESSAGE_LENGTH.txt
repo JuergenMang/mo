@@ -1,0 +1,2 @@
+# Blocks websocket messages with binary data that is too large
+true

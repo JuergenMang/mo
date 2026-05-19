@@ -1,0 +1,3 @@
+# Maximum number of child nodes per element for the default XML content profile
+4096
+#"any"

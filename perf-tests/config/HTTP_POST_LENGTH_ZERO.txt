@@ -1,0 +1,2 @@
+# Blocks POST requests with no payload
+false

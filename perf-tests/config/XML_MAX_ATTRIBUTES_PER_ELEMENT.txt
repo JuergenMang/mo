@@ -1,0 +1,3 @@
+# Maximum number of attributes per XML element for the default XML content profile
+64
+#"any"

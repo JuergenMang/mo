@@ -1,0 +1,2 @@
+# Blocks requests with invalid plaintext format
+true

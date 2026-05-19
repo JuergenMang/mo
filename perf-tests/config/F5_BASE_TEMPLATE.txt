@@ -1,0 +1,3 @@
+# F5 ASM Policy Template
+ax-f5-waf-jump-start-template
+#ax-f5-waf-jump-start-template-case-insensitive

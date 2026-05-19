@@ -1,0 +1,2 @@
+# GraphQL data does not comply with format settings
+true

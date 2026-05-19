@@ -1,0 +1,2 @@
+# Blocks responses with invalid HTTP response codes (ALLOWED_RESPONSE_CODES)
+true

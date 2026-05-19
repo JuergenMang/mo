@@ -1,0 +1,3 @@
+# Maximum length of XML elements or attributes for the default XML content profile
+1024
+#"any"

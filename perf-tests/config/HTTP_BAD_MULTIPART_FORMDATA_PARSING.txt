@@ -1,0 +1,2 @@
+# Blocks requests with invalid multipart/form-data content
+true

@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 #
-# Runs a performance tests
+# Runs performance tests
 #
 
 cd "perf-tests" || exit 1
 . ../mo
 . functions.sh
 
+# Declare variables for the templates
+restsh.util.setvars config >/dev/null
+restsh.util.setvar LARGE.array >/dev/null
 
-mapfile -t ARRAY_JSON_CHARACTERSET < JSON_CHARACTERSET.array
-mapfile -t ARRAY_XML_CHARACTERSET < XML_CHARACTERSET.array
+echo "--"
+echo "Test large arrays"
+time mo template.json | jq "." >/dev/null
 
-time mo template.json > /dev/null
+echo "--"
+echo "Test large template"
+time mo template2.json | jq "." >/dev/null

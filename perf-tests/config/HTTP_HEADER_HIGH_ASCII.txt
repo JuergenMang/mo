@@ -1,0 +1,2 @@
+# Blocks requests with ASCII character values greater than 127 in HTTP headers
+true

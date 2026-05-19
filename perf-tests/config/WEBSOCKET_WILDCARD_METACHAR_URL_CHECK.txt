@@ -1,0 +1,2 @@
+# Checks requests for disallowed metacharacters in the websocket URL
+true

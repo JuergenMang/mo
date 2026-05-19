@@ -1,0 +1,2 @@
+# Maximum size of a GraphQL request
+10485760

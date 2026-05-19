@@ -1,0 +1,2 @@
+# Text content found in binary only WebSocket
+true

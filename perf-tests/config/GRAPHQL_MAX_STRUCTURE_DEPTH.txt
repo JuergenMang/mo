@@ -1,0 +1,2 @@
+# Maximum structure depth of a GraphQL request
+25

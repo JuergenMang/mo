@@ -1,0 +1,2 @@
+# Maximum size of a websocket frame
+10000

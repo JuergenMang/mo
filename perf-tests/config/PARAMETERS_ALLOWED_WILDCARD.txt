@@ -1,0 +1,21 @@
+# Allow all parameters (wildcard). Remove if parameters should be managed manually.
+{
+    "name" : "*",
+    "allowEmptyValue" : true,
+    "allowRepeatedParameterName" : true,
+    "attackSignaturesCheck" : true,
+    "checkMaxValueLength" : true,
+    "checkMetachars" : {{VAR_PARAMETERS_WILDCARD_CHECK_METACHARS}},
+    "isBase64" : false,
+    "isCookie" : false,
+    "isHeader" : false,
+    "level" : "global",
+    "maximumLength" : {{VAR_PARAMETERS_WILDCARD_MAXIMUM_LENGTH}},
+    "metacharsOnParameterValueCheck" : false,
+    "parameterLocation" : "any",
+    "performStaging" : false,
+    "sensitiveParameter" : false,
+    "type" : "wildcard",
+    "valueType" : "{{VAR_PARAMETERS_WILDCARD_VALUE_TYPE}}",
+    "dataType" : "{{VAR_PARAMETERS_WILDCARD_DATA_TYPE}}"
+}

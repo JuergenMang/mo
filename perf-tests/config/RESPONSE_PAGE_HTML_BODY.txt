@@ -1,0 +1,23 @@
+# HTML response body for blocking, must be a valid json string
+<html>
+<head>
+<title>Request Rejected</title>
+</head>
+<body>
+<p>Die angefragte URL wurde abgelehnt.</p>
+<p><!--Bitte kontaktieren Sie:<br>
+Mailadresse: XXX@XXX<br>
+Telefonnummer: +49 XXX XXX</p>
+<p>Bitte geben Sie Ihre Support ID an.<br>-->
+Support ID: <%TS.request.ID()%></p>
+<p><a href='javascript:history.back();'>[Zur&uuml;ck auf vorherige Seite]</a></p>
+<hr>
+<p>The requested URL was rejected.</p>
+<p><!--Please contact:<br>
+mail address: XXX@XXX<br>
+phone number: +49 XXX XXX</p>
+<p>Please provide your support ID.<br>-->
+Support ID: <%TS.request.ID()%></p>
+<p><a href='javascript:history.back();'>[Go Back to former page]</a></p>
+</body>
+</html>

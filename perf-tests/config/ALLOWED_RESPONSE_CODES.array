@@ -1,0 +1,8 @@
+# HTTP response codes allowed from the backend to the client.
+# 1xx and 2xx codes are always allowed regardless of this setting.
+400
+401
+404
+407
+417
+503

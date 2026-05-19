@@ -1,0 +1,2 @@
+# Maximum length of a query string (everything after the ? in the URL)
+4096

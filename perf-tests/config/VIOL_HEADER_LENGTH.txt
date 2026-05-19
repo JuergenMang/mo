@@ -1,0 +1,2 @@
+# Blocks requests with headers that are too large
+true

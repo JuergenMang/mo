@@ -1,0 +1,2 @@
+# Blocks requests with whitespace characters in the URL (before decoding)
+true

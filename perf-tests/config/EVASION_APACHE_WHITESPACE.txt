@@ -1,0 +1,2 @@
+# Block of unusual whitespace characters
+true

@@ -1,0 +1,1131 @@
+{
+   "policy" : {
+      "type" : "security",
+      "name" : "{{WAF_POLICY_NAME}}",
+      "description" : "Created by {{CI_JOB_URL}}",
+      "template" : {
+         "name" : "{{VAR_F5_BASE_TEMPLATE}}"
+      },
+      "enforcementMode" : "{{VAR_ENFORCEMENT_MODE}}",
+      "general" : {
+         "allowedResponseCodes" : [
+            {{#ARRAY_ALLOWED_RESPONSE_CODES}}
+               {{MO_COMMA_IF_NOT_FIRST}}
+               "{{.}}"
+            {{/ARRAY_ALLOWED_RESPONSE_CODES}}
+         ],
+         "pathParameterHandling" : "{{VAR_PATH_PARAMETER_HANDLING}}"
+      },
+      {{OPENAPI_FILE_IMPORT}}
+      "methods" : [
+         {{#ARRAY_METHODS}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "name": "{{MO_CSV_GET_FIRST {{.}}}}",
+               "actAsMethod": "{{MO_CSV_GET_LAST {{.}}}}"
+            }
+         {{/ARRAY_METHODS}}
+      ],
+      "response-pages" : [
+         {
+            "responsePageType" : "default",
+            "responseActionType" : "custom",
+            "responseContent" : "{{VAR_RESPONSE_PAGE_HTML_BODY}}",
+            "responseHeader" : "{{VAR_RESPONSE_PAGE_HTML_HEADER}}"
+         },
+         {
+            "responsePageType" : "persistent-flow",
+            "responseActionType" : "custom",
+            "responseContent" : "{{VAR_RESPONSE_PAGE_HTML_BODY}}",
+            "responseHeader" : "{{VAR_RESPONSE_PAGE_HTML_HEADER}}"
+         },
+         {
+            "responsePageType" : "mobile",
+            "responseActionType" : "custom",
+            "responseContent" : "{{VAR_RESPONSE_PAGE_JSON_BODY}}",
+            "responseHeader" : "{{VAR_RESPONSE_PAGE_JSON_HEADER}}"
+         },
+         {
+            "responsePageType" : "xml",
+            "responseActionType" : "custom",
+            "responseContent" : "{{VAR_RESPONSE_PAGE_XML_BODY}}",
+            "responseHeader" : "{{VAR_RESPONSE_PAGE_XML_HEADER}}"
+         },
+         {
+            "responsePageType" : "graphql",
+            "responseActionType" : "custom",
+            "responseContent" : "{{VAR_RESPONSE_PAGE_GRAPHQL_BODY}}",
+            "responseHeader" : "{{VAR_RESPONSE_PAGE_GRAPHQL_HEADER}}"
+         }
+      ],
+      "policy-builder" : {
+         "learningMode" : "{{VAR_POLICY_BUILDER_LEARNING_MODE}}"
+      },
+      "ip-intelligence" : {
+         "enabled" : {{VAR_IP_INTELLIGENCE}}
+      },
+      "server-technologies" : [
+         {{#ARRAY_SERVER_TECHNOLOGIES}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "serverTechnologyName" : "{{.}}"
+            }
+         {{/ARRAY_SERVER_TECHNOLOGIES}}
+      ],
+      "signature-settings" : {
+         "placeSignaturesInStaging" : {{VAR_SIGNATURE_STAGING}},
+         "signatureStaging" : {{VAR_SIGNATURE_STAGING}}
+      },
+      "signature-sets" : [
+         {{#ARRAY_SIGNATURE_SETS}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "name" : "{{MO_CSV_GET_FIRST {{.}}}}",
+               "alarm" : "{{MO_CSV_GET_ENTRY {{.}} '1'}}",
+               "block" : "{{MO_CSV_GET_ENTRY {{.}} '2'}}",
+               "learn" : "{{MO_CSV_GET_ENTRY {{.}} '3'}}"
+            }
+         {{/ARRAY_SIGNATURE_SETS}}
+      ],
+      "signatures" : [
+         {{#ARRAY_SIGNATURES_DISABLED}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "enabled" : false,
+               "performStaging" : false,
+               "signatureId" : "{{.}}"
+            }
+         {{/ARRAY_SIGNATURES_DISABLED}}
+      ],
+      "blocking-settings" : {
+         "evasions" : [
+            {
+               "description" : "Bad unescape",
+               "enabled" : {{VAR_EVASION_BAD_UNESCAPE}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_BAD_UNESCAPE_LEARN' 'false'}}
+            },
+            {
+               "description" : "Apache whitespace",
+               "enabled" : {{VAR_EVASION_APACHE_WHITESPACE}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_APACHE_WHITESPACE_LEARN' 'false'}}
+            },
+            {
+               "description" : "Bare byte decoding",
+               "enabled" : {{VAR_EVASION_BARE_BYTE_DECODING}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_BARE_BYTE_DECODING_LEARN' 'false'}}
+            },
+            {
+               "description" : "IIS Unicode codepoints",
+               "enabled" : {{VAR_EVASION_IIS_UNICODE_CODEPOINTS}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_IIS_UNICODE_CODEPOINTS_LEARN' 'false'}}
+            },
+            {
+               "description" : "IIS backslashes",
+               "enabled" : {{VAR_EVASION_IIS_BACKSLASHES}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_IIS_BACKSLASHES_LEARN' 'false'}}
+            },
+            {
+               "description" : "%u decoding",
+               "enabled" : {{VAR_EVASION_PRCT_U_DECODING}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_PRCT_U_DECODING_LEARN' 'false'}}
+            },
+            {
+               "description" : "Multiple decoding",
+               "enabled" : {{VAR_EVASION_MULTIPLE_DECODING}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_MULTIPLE_DECODING_LEARN' 'false'}},
+               "maxDecodingPasses" : {{VAR_EVASION_MULTIPLE_DECODING_PASSES}}
+            },
+            {
+               "description" : "Directory traversals",
+               "enabled" : {{VAR_EVASION_DIRECTORY_TRAVERSALS}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_DIRECTORY_TRAVERSALS_LEARN' 'false'}}
+            },
+            {
+                "description" : "Multiple slashes",
+                "enabled" : {{VAR_EVASION_MULTIPLE_SLASHES}},
+                "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_MULTIPLE_SLASHES_LEARN' 'false'}}
+            },
+            {
+                "description" : "Trailing slash",
+                "enabled" : {{VAR_EVASION_TRAILING_SLASH}},
+                "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_TRAILING_SLASH_LEARN' 'false'}}
+            },
+            {
+                "description" : "Trailing dot",
+                "enabled" : {{VAR_EVASION_TRAILING_DOT}},
+                "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_TRAILING_DOT_LEARN' 'false'}}
+            },
+            {
+                "description" : "Semicolon path parameters",
+                "enabled" : {{VAR_EVASION_SEMICOLON_PATH_PARAMETERS}},
+                "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_EVASION_SEMICOLON_PATH_PARAMETERS_LEARN' 'false'}}
+            }
+         ],
+         "http-protocols" : [
+            {
+               "description" : "No Host header in HTTP/1.1 request",
+               "enabled" : true,
+               "learn" : false
+            },
+            {
+               "description" : "Multiple host headers",
+               "enabled" : true,
+               "learn" : false
+            },
+            {
+               "description" : "Bad host header value",
+               "enabled" : true,
+               "learn" : false
+            },
+            {
+               "description" : "Host header contains IP address",
+               "enabled" : {{VAR_HTTP_HOST_HEADER_CONTAINS_IP}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_HOST_HEADER_CONTAINS_IP_LEARN' 'false'}}
+            },
+            {
+               "description" : "Check maximum number of parameters",
+               "enabled" : {{VAR_HTTP_MAX_PARAMS_CHECK}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_MAX_PARAMS_CHECK_LEARN' 'true'}},
+               "maxParams" : {{VAR_HTTP_MAX_PARAMS_COUNT}}
+            },
+            {
+               "description" : "Check maximum number of headers",
+               "enabled" : true,
+               "learn" : true,
+               "maxHeaders" : {{VAR_HTTP_MAX_HEADER_COUNT}}
+            },
+            {
+               "description" : "Unparsable request content",
+               "enabled" : true
+            },
+            {
+               "description" : "High ASCII characters in headers",
+               "enabled" : {{VAR_HTTP_HEADER_HIGH_ASCII}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_HEADER_HIGH_ASCII_LEARN' 'false'}}
+            },
+            {
+               "description" : "Null in request",
+               "enabled" : {{VAR_HTTP_NULL_IN_REQUEST}}
+            },
+            {
+               "description" : "Bad HTTP version",
+               "enabled" : true
+            },
+            {
+               "description" : "Chunked request with Content-Length header",
+               "enabled" : true,
+               "learn" : false
+            },
+            {
+               "description" : "Several Content-Length headers",
+               "enabled" : true,
+               "learn" : false
+            },
+            {
+               "description" : "Content length should be a positive number",
+               "enabled" : true,
+               "learn" : false
+            },
+            {
+               "description" : "CRLF characters before request start",
+               "enabled" : true,
+               "learn" : false
+            },
+            {
+               "description" : "Bad multipart parameters parsing",
+               "enabled" : {{VAR_HTTP_BAD_MULTIPART_PARAMETER_PARSING}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_BAD_MULTIPART_PARAMETER_PARSING_LEARN' 'false'}}
+            },
+            {
+               "description" : "Bad multipart/form-data request parsing",
+               "enabled" : {{VAR_HTTP_BAD_MULTIPART_FORMDATA_PARSING}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_BAD_MULTIPART_FORMDATA_PARSING_LEARN' 'false'}}
+            },
+            {
+               "description" : "Body in GET or HEAD requests",
+               "enabled" : {{VAR_HTTP_BODY_IN_GET_OR_HEAD_REQUESTS}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_BODY_IN_GET_OR_HEAD_REQUESTS_LEARN' 'false'}}
+            },
+            {
+               "description" : "Header name with no header value",
+               "enabled" : false,
+               "learn" : false
+            },
+            {
+               "description" : "POST request with Content-Length: 0",
+               "enabled" : {{VAR_HTTP_POST_LENGTH_ZERO}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_POST_LENGTH_ZERO_LEARN' 'false'}}
+            },
+            {
+               "description" : "Check maximum number of cookies",
+               "enabled" : {{VAR_HTTP_MAX_COOKIES_CHECK}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_MAX_COOKIES_CHECK_LEARN' 'true'}},
+               "maxCookies" : {{VAR_HTTP_MAX_COOKIES}}
+            },
+            {
+                "description" : "Unescaped space in URL",
+                "enabled" : {{VAR_HTTP_UNESCAPED_SPACE_IN_URL}},
+                "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_HTTP_UNESCAPED_SPACE_IN_URL_LEARN' 'false'}}
+            }
+         ],
+         "violations" : [
+            {
+               "name" : "VIOL_HTTP_RESPONSE_STATUS",
+               "description" : "Illegal HTTP status in response",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HTTP_RESPONSE_STATUS_ALARM' {{VAR_VIOL_HTTP_RESPONSE_STATUS}}}},
+               "block" : {{VAR_VIOL_HTTP_RESPONSE_STATUS}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HTTP_RESPONSE_STATUS_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_METHOD",
+               "description" : "Illegal method",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_METHOD_ALARM' {{VAR_VIOL_METHOD}}}},
+               "block" : {{VAR_VIOL_METHOD}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_METHOD_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_GWT_FORMAT",
+               "description" : "GWT data does not comply with format settings",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GWT_FORMAT_ALARM' {{VAR_VIOL_GWT_FORMAT}}}},
+               "block" : {{VAR_VIOL_GWT_FORMAT}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GWT_FORMAT_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_GWT_MALFORMED",
+               "description" : "Malformed GWT data",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GWT_MALFORMED_ALARM' {{VAR_VIOL_GWT_MALFORMED}}}},
+               "block" : {{VAR_VIOL_GWT_MALFORMED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GWT_MALFORMED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_GRAPHQL_INTROSPECTION_QUERY",
+               "description" : "GraphQL introspection query",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GRAPHQL_INTROSPECTION_QUERY_ALARM' {{VAR_VIOL_GRAPHQL_INTROSPECTION_QUERY}}}},
+               "block" : {{VAR_VIOL_GRAPHQL_INTROSPECTION_QUERY}}
+            },
+            {
+               "name" : "VIOL_GRAPHQL_FORMAT",
+               "description" : "GraphQL data does not comply with format settings",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GRAPHQL_FORMAT_ALARM' {{VAR_VIOL_GRAPHQL_FORMAT}}}},
+               "block" : {{VAR_VIOL_GRAPHQL_FORMAT}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GRAPHQL_FORMAT_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_GRAPHQL_MALFORMED",
+               "description" : "Malformed GraphQL data",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GRAPHQL_MALFORMED_ALARM' {{VAR_VIOL_GRAPHQL_MALFORMED}}}},
+               "block" : {{VAR_VIOL_GRAPHQL_MALFORMED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GRAPHQL_MALFORMED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_JSON_SCHEMA",
+               "description" : "JSON data does not comply with JSON schema",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_JSON_SCHEMA_ALARM' {{VAR_VIOL_JSON_SCHEMA}}}},
+               "block" : {{VAR_VIOL_JSON_SCHEMA}}
+            },
+            {
+               "name" : "VIOL_JSON_MALFORMED",
+               "description" : "Malformed JSON data",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_JSON_MALFORMED_ALARM' {{VAR_VIOL_JSON_MALFORMED}}}},
+               "block" : {{VAR_VIOL_JSON_MALFORMED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_JSON_MALFORMED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_JSON_FORMAT",
+               "description" : "JSON data does not comply with format settings",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_JSON_FORMAT_ALARM' {{VAR_VIOL_JSON_FORMAT}}}},
+               "block" : {{VAR_VIOL_JSON_FORMAT}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_JSON_FORMAT_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_XML_MALFORMED",
+               "description" : "Malformed XML data",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_MALFORMED_ALARM' {{VAR_VIOL_XML_MALFORMED}}}},
+               "block" : {{VAR_VIOL_XML_MALFORMED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_MALFORMED_LEARN' 'false'}}
+               
+            },
+            {
+               "name" : "VIOL_XML_SCHEMA",
+               "description" : "XML data does not comply with schema or WSDL document",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_SCHEMA_ALARM' {{VAR_VIOL_XML_SCHEMA}}}},
+               "block" : {{VAR_VIOL_XML_SCHEMA}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_SCHEMA_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_XML_FORMAT",
+               "description" : "XML data does not comply with format settings",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_FORMAT_ALARM' {{VAR_VIOL_XML_FORMAT}}}},
+               "block" : {{VAR_VIOL_XML_FORMAT}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_FORMAT_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_XML_SOAP_METHOD",
+               "description" : "SOAP method not allowed",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_SOAP_METHOD_ALARM' {{VAR_VIOL_XML_SOAP_METHOD}}}},
+               "block" : {{VAR_VIOL_XML_SOAP_METHOD}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_SOAP_METHOD_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_XML_SOAP_ATTACHMENT",
+               "description" : "Illegal attachment in SOAP message",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_SOAP_ATTACHMENT_ALARM' {{VAR_VIOL_XML_SOAP_ATTACHMENT}}}},
+               "block" : {{VAR_VIOL_XML_SOAP_ATTACHMENT}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_XML_SOAP_ATTACHMENT_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_PLAINTEXT_FORMAT",
+               "description" : "Plain text data does not comply with format settings",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PLAINTEXT_FORMAT_ALARM' {{VAR_VIOL_PLAINTEXT_FORMAT}}}},
+               "block" : {{VAR_VIOL_PLAINTEXT_FORMAT}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PLAINTEXT_FORMAT_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_HOSTNAME",
+               "description" : "Illegal host name",
+               "alarm" : {{MO_TRUE_IF_NOT_EMPTY 'ARRAY_HOSTNAMES'}},
+               "block" : {{MO_TRUE_IF_NOT_EMPTY 'ARRAY_HOSTNAMES'}}
+            },
+            {
+               "name" : "VIOL_HOSTNAME_MISMATCH",
+               "description" : "Host name mismatch",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_ASM_COOKIE_MODIFIED",
+               "description" : "Modified ASM cookie",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_ASM_COOKIE_MODIFIED_ALARM' {{VAR_VIOL_ASM_COOKIE_MODIFIED}}}},
+               "block" : {{VAR_VIOL_ASM_COOKIE_MODIFIED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_ASM_COOKIE_MODIFIED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_ASM_COOKIE_HIJACKING",
+               "description" : "ASM Cookie Hijacking",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_ASM_COOKIE_HIJACKING_ALARM' {{VAR_VIOL_ASM_COOKIE_HIJACKING}}}},
+               "block" : {{VAR_VIOL_ASM_COOKIE_HIJACKING}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_ASM_COOKIE_HIJACKING_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_COOKIE_MODIFIED",
+               "description" : "Modified domain cookie(s)",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_MODIFIED_ALARM' {{VAR_VIOL_COOKIE_MODIFIED}}}},
+               "block" : {{VAR_VIOL_COOKIE_MODIFIED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_MODIFIED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_COOKIE_MALFORMED",
+               "description" : "Cookie not RFC-compliant",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_MALFORMED_ALARM' {{VAR_VIOL_COOKIE_MALFORMED}}}},
+               "block" : {{VAR_VIOL_COOKIE_MALFORMED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_MALFORMED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_COOKIE_EXPIRED",
+               "description" : "Expired timestamp",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_EXPIRED_ALARM' {{VAR_VIOL_COOKIE_EXPIRED}}}},
+               "block" : {{VAR_VIOL_COOKIE_EXPIRED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_EXPIRED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_COOKIE_LENGTH",
+               "description" : "Illegal cookie length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_LENGTH_ALARM' {{VAR_VIOL_COOKIE_LENGTH}}}},
+               "block" : {{VAR_VIOL_COOKIE_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_COOKIE_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_HEADER_REPEATED",
+               "description" : "Illegal repeated header",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HEADER_REPEATED_ALARM' {{VAR_VIOL_HEADER_REPEATED}}}},
+               "block" : {{VAR_VIOL_HEADER_REPEATED}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HEADER_REPEATED_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_MANDATORY_HEADER",
+               "description" : "Mandatory HTTP header is missing",
+               "alarm" : true,
+               "block" : true,
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_HEADER_METACHAR",
+               "description" : "Illegal meta character in header",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HEADER_METACHAR_ALARM' {{VAR_VIOL_HEADER_METACHAR}}}},
+               "block" : {{VAR_VIOL_HEADER_METACHAR}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HEADER_METACHAR_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_HEADER_LENGTH",
+               "description" : "Illegal header length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HEADER_LENGTH_ALARM' {{VAR_VIOL_HEADER_LENGTH}}}},
+               "block" : {{VAR_VIOL_HEADER_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_HEADER_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_THREAT_CAMPAIGN",
+               "description" : "Threat Campaign detected",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_ATTACK_SIGNATURE",
+               "description" : "Attack signature detected"
+            },
+            {
+               "name" : "VIOL_BLACKLISTED_IP",
+               "description" : "IP is blacklisted",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_BINARY_MESSAGE_LENGTH",
+               "description" : "Illegal WebSocket binary message length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_BINARY_MESSAGE_LENGTH_ALARM' {{VAR_VIOL_WEBSOCKET_BINARY_MESSAGE_LENGTH}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_BINARY_MESSAGE_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_BINARY_MESSAGE_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_FRAME_LENGTH",
+               "description" : "Illegal WebSocket frame length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_FRAME_LENGTH_ALARM' {{VAR_VIOL_WEBSOCKET_FRAME_LENGTH}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_FRAME_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_FRAME_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_FRAMES_PER_MESSAGE_COUNT",
+               "description" : "Illegal number of frames per message",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_FRAMES_PER_MESSAGE_COUNT_ALARM' {{VAR_VIOL_WEBSOCKET_FRAMES_PER_MESSAGE_COUNT}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_FRAMES_PER_MESSAGE_COUNT}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_FRAMES_PER_MESSAGE_COUNT_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_EXTENSION",
+               "description" : "Illegal WebSocket extension",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_EXTENSION_ALARM' {{VAR_VIOL_WEBSOCKET_EXTENSION}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_EXTENSION}},
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_TEXT_NULL_VALUE",
+               "description" : "Null character found in WebSocket text message",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_TEXT_NULL_VALUE_ALARM' {{VAR_VIOL_WEBSOCKET_TEXT_NULL_VALUE}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_TEXT_NULL_VALUE}}
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_FRAME_MASKING",
+               "description" : "Mask not found in client frame",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_FRAME_MASKING_ALARM' {{VAR_VIOL_WEBSOCKET_FRAME_MASKING}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_FRAME_MASKING}},
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_FRAMING_PROTOCOL",
+               "description" : "Failure in WebSocket framing protocol",
+               "alarm" : true,
+               "block" : true,
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_BAD_REQUEST",
+               "description" : "Bad WebSocket handshake request",
+               "alarm" : true,
+               "block" : true,
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_TEXT_MESSAGE_NOT_ALLOWED",
+               "description" : "Text content found in binary only WebSocket",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_TEXT_MESSAGE_NOT_ALLOWED_ALARM' {{VAR_VIOL_WEBSOCKET_TEXT_MESSAGE_NOT_ALLOWED}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_TEXT_MESSAGE_NOT_ALLOWED}},
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_WEBSOCKET_BINARY_MESSAGE_NOT_ALLOWED",
+               "description" : "Binary content found in text only WebSocket",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_WEBSOCKET_BINARY_MESSAGE_NOT_ALLOWED_ALARM' {{VAR_VIOL_WEBSOCKET_BINARY_MESSAGE_NOT_ALLOWED}}}},
+               "block" : {{VAR_VIOL_WEBSOCKET_BINARY_MESSAGE_NOT_ALLOWED}},
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_MALICIOUS_IP",
+               "description" : "Access from malicious IP address",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_URL_CONTENT_TYPE",
+               "description" : "Illegal request content type",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_URL_CONTENT_TYPE_ALARM' {{VAR_VIOL_URL_CONTENT_TYPE}}}},
+               "block" : {{VAR_VIOL_URL_CONTENT_TYPE}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_URL_CONTENT_TYPE_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_PARAMETER_VALUE_LENGTH",
+               "description" : "Illegal parameter value length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_VALUE_LENGTH_ALARM' {{VAR_VIOL_PARAMETER_VALUE_LENGTH}}}},
+               "block" : {{VAR_VIOL_PARAMETER_VALUE_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_VALUE_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_FILETYPE",
+               "description" : "Illegal file type",
+               "alarm" : true,
+               "block" : true,
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_FILETYPE_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_URL",
+               "description" : "Illegal URL",
+               "alarm" : true,
+               "block" : true,
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_URL_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_PARAMETER",
+               "description" : "Illegal parameter",
+               "alarm" : true,
+               "block" : true,
+               "learn" : true
+            },
+            {
+               "name" : "VIOL_POST_DATA_LENGTH",
+               "description" : "Illegal POST data length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_POST_DATA_LENGTH_ALARM' {{VAR_VIOL_POST_DATA_LENGTH}}}},
+               "block" : {{VAR_VIOL_POST_DATA_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_POST_DATA_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_PARAMETER_MULTIPART_NULL_VALUE",
+               "description" : "Null in multi-part parameter value",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_MULTIPART_NULL_VALUE_ALARM' {{VAR_VIOL_PARAMETER_MULTIPART_NULL_VALUE}}}},
+               "block" : {{VAR_VIOL_PARAMETER_MULTIPART_NULL_VALUE}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_MULTIPART_NULL_VALUE_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_PARAMETER_REPEATED",
+               "description" : "Illegal repeated parameter name",
+               "alarm" : true,
+               "block" : true,
+               "learn" : true
+            },
+            {
+               "name" : "VIOL_URL_METACHAR",
+               "description" : "Illegal meta character in URL",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_URL_METACHAR_ALARM' {{VAR_VIOL_URL_METACHAR}}}},
+               "block" : {{VAR_VIOL_URL_METACHAR}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_URL_METACHAR_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_PARAMETER_NAME_METACHAR",
+               "description" : "Illegal meta character in parameter name",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_NAME_METACHAR_ALARM' {{VAR_VIOL_PARAMETER_NAME_METACHAR}}}},
+               "block" : {{VAR_VIOL_PARAMETER_NAME_METACHAR}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_NAME_METACHAR_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_PARAMETER_VALUE_METACHAR",
+               "description" : "Illegal meta character in value",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_VALUE_METACHAR_ALARM' 'false'}},
+               "block" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_VALUE_METACHAR' 'false'}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_PARAMETER_VALUE_METACHAR_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_PARAMETER_DATA_TYPE",
+               "description" : "Illegal parameter data type",
+               "alarm" : false,
+               "block" : false,
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_URL_LENGTH",
+               "description" : "Illegal URL length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_URL_LENGTH_ALARM' {{VAR_VIOL_URL_LENGTH}}}},
+               "block" : {{VAR_VIOL_URL_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_URL_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_REQUEST_LENGTH",
+               "description" : "Illegal request length",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_REQUEST_LENGTH_ALARM' {{VAR_VIOL_REQUEST_LENGTH}}}},
+               "block" : {{VAR_VIOL_REQUEST_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_REQUEST_LENGTH_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_REQUEST_MAX_LENGTH",
+               "description" : "Request length exceeds defined buffer size",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_REQUEST_MAX_LENGTH_ALARM' {{VAR_VIOL_REQUEST_MAX_LENGTH}}}},
+               "block" : {{VAR_VIOL_REQUEST_MAX_LENGTH}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_REQUEST_MAX_LENGTH_LEARN' 'false'}}
+            },
+            {
+               "name" : "VIOL_QUERY_STRING_LENGTH",
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_QUERY_STRING_LENGTH_LEARN' 'true'}},
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_QUERY_STRING_LENGTH_ALARM' {{VAR_VIOL_QUERY_STRING_LENGTH}}}},
+               "block" : {{VAR_VIOL_QUERY_STRING_LENGTH}},
+               "description" : "Illegal query string length"
+            },
+            {
+               "name" : "VIOL_GEOLOCATION",
+               "description" : "Access from disallowed Geolocation",
+               "alarm" : true,
+               "block" : true,
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_HTTP_PROTOCOL",
+               "description" : "HTTP protocol compliance failed",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_QUERY_STRING_LENGTH_ALARM' {{VAR_VIOL_HTTP_PROTOCOL}}}},
+               "block" : {{VAR_VIOL_HTTP_PROTOCOL}},
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_ENCODING",
+               "description" : "Failed to convert character",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_QUERY_STRING_LENGTH_ALARM' {{VAR_VIOL_ENCODING}}}},
+               "block" : {{VAR_VIOL_ENCODING}}
+            },
+            {
+               "name" : "VIOL_EVASION",
+               "description" : "Evasion technique detected",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_QUERY_STRING_LENGTH_ALARM' {{VAR_VIOL_EVASION}}}},
+               "block" : {{VAR_VIOL_EVASION}},
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_THREAT_ANALYSIS",
+               "description" : "Mitigation action determined by Threat Analysis Platform",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_SESSION_AWARENESS",
+               "description" : "Access from disallowed User/Session/IP/Device ID",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_CONVICTION",
+               "description" : "Bad Actor Convicted",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_BLOCKING_CONDITION",
+               "description" : "Blocking Condition Detected",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_BRUTE_FORCE",
+               "description" : "Brute Force: Maximum login attempts are exceeded",
+               "alarm" : true,
+               "block" : true
+            },
+            {
+               "name" : "VIOL_CROSS_ORIGIN_REQUEST",
+               "description" : "Illegal cross-origin request",
+               "alarm" : false,
+               "block" : false,
+               "learn" : false
+            },
+            {
+               "name" : "VIOL_FILE_UPLOAD",
+               "description" : "Disallowed file upload content detected",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_FILE_UPLOAD_ALARM' {{VAR_VIOL_FILE_UPLOAD}}}},
+               "block" : {{VAR_VIOL_FILE_UPLOAD}},
+               "learn" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_FILE_UPLOAD_LEARN' 'true'}}
+            },
+            {
+               "name" : "VIOL_FILE_UPLOAD_IN_BODY",
+               "description" : "Disallowed file upload content detected in body",
+               "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_FILE_UPLOAD_ALARM' {{VAR_VIOL_FILE_UPLOAD}}}},
+               "block" : {{VAR_VIOL_FILE_UPLOAD}}
+            },
+            {
+                "name" : "VIOL_GRAPHQL_ERROR_RESPONSE",
+                "description" : "GraphQL disallowed pattern in response",
+                "alarm" : {{MO_VALUE_OR_DEFAULT 'VAR_VIOL_GRAPHQL_ERROR_RESPONSE_ALARM' {{VAR_VIOL_GRAPHQL_ERROR_RESPONSE}}}},
+                "block" : {{VAR_VIOL_GRAPHQL_ERROR_RESPONSE}}
+            },
+            {
+                "name" : "VIOL_RATING_NEED_EXAMINATION",
+                "description" : "Violation Rating Need Examination detected",
+                "alarm" : {{VAR_VIOL_RATING_NEED_EXAMINATION_ALARM}},
+                "block" : false
+            },
+            {
+                "name" : "VIOL_RATING_THREAT",
+                "description" : "Violation Rating Threat detected",
+                "alarm" : {{VAR_VIOL_RATING_THREAT}},
+                "block" : {{VAR_VIOL_RATING_THREAT}}
+            }
+         ]
+      },
+      "header-settings" : {
+         "maximumHttpHeaderLength" : "{{VAR_HTTP_HEADER_LENGTH}}"
+      },
+      "headers" : [
+         {{MO_VAR_PARSE 'VAR_HTTP_HEADER_WILDCARD'}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_HTTP_HEADER_WILDCARD' 'ARRAY_HTTP_HEADER'}}
+         {{#ARRAY_HTTP_HEADER}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "allowRepeatedOccurrences" : {{MO_CSV_GET_ENTRY {{.}} '2'}},
+               "base64Decoding" : false,
+               "checkSignatures" : true,
+               "htmlNormalization" : false,
+               "mandatory" : false,
+               "maskValueInLogs" : {{MO_CSV_GET_ENTRY {{.}} '1'}},
+               "name" : "{{MO_CSV_GET_FIRST {{.}}}}",
+               "normalizationViolations" : false,
+               "percentDecoding" : false,
+               "type" : "explicit",
+               "urlNormalization" : false
+            }
+         {{/ARRAY_HTTP_HEADER}}
+      ],
+      "host-names" : [
+         {{#ARRAY_HOSTNAMES}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "includeSubdomains" : false,
+               "name" : "{{.}}"
+            }
+         {{/ARRAY_HOSTNAMES}}
+      ],
+      "json-profiles" : [
+         {{VAR_JSON_PROFILES_EXTRA}}
+         {
+            "name" : "Default",
+            "description" : "Default JSON Profile",
+            "attackSignaturesCheck" : true,
+            "defenseAttributes" : {
+               "maximumArrayLength" : {{VAR_JSON_MAX_ARRAY_LENGTH}},
+               "maximumStructureDepth" : {{VAR_JSON_MAX_STRUCTURE_DEPTH}},
+               "maximumTotalLengthOfJSONData" : {{VAR_JSON_MAX_DATA_LENGTH}},
+               "maximumValueLength" : {{VAR_JSON_MAX_VALUE_LENGTH}},
+               "tolerateJSONParsingWarnings" : true
+            },
+            "handleJsonValuesAsParameters" : {{VAR_JSON_HANDLE_VALUES_AS_PARAMETERS}},
+            "hasValidationFiles" : false,
+            "validationFiles" : [],
+            "signatureOverrides" : [
+               {{#ARRAY_JSON_DISABLED_SIGNATURES}}
+                  {{MO_COMMA_IF_NOT_FIRST}}
+                  {
+                     "enabled" : false,
+                     "signatureId" : {{.}}
+                  }
+               {{/ARRAY_JSON_DISABLED_SIGNATURES}}
+            ],
+            "sensitiveData" : [
+               {{#ARRAY_JSON_SENSITIVE_DATA}}
+                  {{MO_COMMA_IF_NOT_FIRST}}
+                  {
+                     "parameterName" : "{{.}}"
+                  }
+               {{/ARRAY_JSON_SENSITIVE_DATA}}
+            ]
+         }
+         {{GET_JSON_CONTENT_PROFILES}}
+      ],
+      "graphql-profiles" : [
+         {{VAR_GRAPHQL_PROFILES_EXTRA}}
+         {
+            "name" : "Default",
+            "description" : "Default GraphQL Profile",
+            "attackSignaturesCheck" : true,
+            "defenseAttributes" : {
+               "allowIntrospectionQueries" : {{VAR_GRAPHQL_ALLOW_INTROSPECTION}},
+               "maximumBatchedQueries" : {{VAR_GRAPHQL_MAX_BATCHED_QUERIES}},
+               "maximumStructureDepth" : {{VAR_GRAPHQL_MAX_STRUCTURE_DEPTH}},
+               "maximumTotalLength" : {{VAR_GRAPHQL_MAX_LENGTH}},
+               "maximumValueLength" : {{VAR_GRAPHQL_MAX_VALUE_LENGTH}},
+               "tolerateParsingWarnings" : true
+            },
+            "metacharElementCheck" : {{VAR_GRAPHQL_METACHAR_ELEMENT_CHECK}}
+         }
+      ],
+      "gwt-profiles" : [
+         {{VAR_GWT_PROFILES_EXTRA}}
+         {
+            "name" : "Default",
+            "description" : "Default GWT Profile",
+            "attackSignaturesCheck" : true,
+            "defenseAttributes" : {
+               "maximumTotalLengthOfGWTData" : {{VAR_GWT_MAX_LENGTH}},
+               "maximumValueLength" : {{VAR_GWT_MAX_VALUE_LENGTH}},
+               "tolerateGWTParsingWarnings" : true
+            },
+            "metacharElementCheck" : {{VAR_GWT_METACHAR_ELEMENT_CHECK}}
+         }
+      ],
+      "plain-text-profiles" : [
+         {
+            "name" : "Default",
+            "description" : "Default Plain Text Profile",
+            "attackSignaturesCheck" : true,
+            "defenseAttributes" : {
+               "maximumLineLength" : "any",
+               "maximumTotalLength" : {{VAR_PLAIN_TEXT_MAX_TOTAL_LENGTH}},
+               "performPercentDecoding" : false
+            },
+            "metacharElementCheck" : false
+         }
+      ],
+      "xml-profiles" : [
+         {{VAR_XML_PROFILES_EXTRA}}
+         {
+            "name" : "Default",
+            "description" : "Default XML Profile",
+            "attachmentsInSoapMessages" : false,
+            "attackSignaturesCheck" : true,
+            "defenseAttributes" : {
+               "allowCDATA" : true,
+               "allowDTDs" : true,
+               "allowExternalReferences" : true,
+               "allowProcessingInstructions" : true,
+               "maximumAttributeValueLength" : {{VAR_XML_ATTRIBUTE_VALUE_LENGTH}},
+               "maximumAttributesPerElement" : {{VAR_XML_MAX_ATTRIBUTES_PER_ELEMENT}},
+               "maximumChildrenPerElement" : {{VAR_XML_MAX_CHILDREN_PER_ELEMENT}},
+               "maximumDocumentDepth" : {{VAR_XML_MAX_DOCUMENT_DEPTH}},
+               "maximumDocumentSize" : {{VAR_XML_MAX_DOCUMENT_SIZE}},
+               "maximumElements" : {{VAR_XML_MAX_ELEMENTS}},
+               "maximumNSDeclarations" : {{VAR_XML_MAX_NS_DECLARATIONS}},
+               "maximumNameLength" : {{VAR_XML_MAX_NAME_LENGTH}},
+               "maximumNamespaceLength" : {{VAR_XML_MAX_NAMESPACE_LENGTH}},
+               "tolerateCloseTagShorthand" : true,
+               "tolerateLeadingWhiteSpace" : true,
+               "tolerateNumericNames" : true
+            },
+            "enableWss" : false,
+            "followSchemaLinks" : false,
+            "inspectSoapAttachments" : false,
+            "metacharAttributeCheck" : {{VAR_XML_METACHAR_ATTRIBUTE_CHECK}},
+            "metacharElementCheck" : {{VAR_XML_METACHAR_ELEMENT_CHECK}},
+            "useXmlResponsePage" : true,
+            "validationFiles" : [],
+            "validationSoapActionHeader" : false,
+            "sensitiveData" : [
+               {{#ARRAY_XML_SENSITIVE_DATA}}
+                  { 
+                     "namespace": "*",
+                     "paramName": "{{MO_CSV_GET_FIRST {{.}}}}",
+                     "paramType": "{{MO_CSV_GET_LAST {{.}}}}" }
+               {{/ARRAY_XML_SENSITIVE_DATA}}
+            ]
+         }
+         {{VAR_XML_PROFILES_WSDL}}
+      ],
+      "xml-validation-files" : [
+         {{#ARRAY_XML_VALIDATION_FILES}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {{GET_WSDL {{.}}}}
+         {{/ARRAY_XML_VALIDATION_FILES}}
+      ],
+      "cookie-settings" : {
+         "maximumCookieHeaderLength" : "{{VAR_COOKIE_HEADER_LENGTH}}"
+      },
+      "cookies" : [
+         {{MO_VAR_PARSE 'VAR_COOKIES_WILDCARD'}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_COOKIES_WILDCARD' 'ARRAY_COOKIES'}}
+         {{#ARRAY_COOKIES}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "accessibleOnlyThroughTheHttpProtocol" : {{MO_CSV_GET_ENTRY {{.}} '4'}},
+               "attackSignaturesCheck" : true,
+               "enforcementType" : "{{MO_CSV_GET_ENTRY {{.}} '1'}}",
+               "insertSameSiteAttribute" : "{{MO_CSV_GET_ENTRY {{.}} '3'}}",
+               "isBase64" : false,
+               "maskValueInLogs" : {{MO_CSV_GET_ENTRY {{.}} '2'}},
+               "name" : "{{MO_CSV_GET_FIRST {{.}}}}",
+               "performStaging" : false,
+               "securedOverHttpsConnection" : true,
+               "type" : "explicit"
+            }
+         {{/ARRAY_COOKIES}}
+      ],
+      "disallowed-geolocations" : [
+         {
+            "countryCode" : "A1",
+            "countryName" : "Anonymous Proxy"
+         }
+      ],
+      "filetypes" : [
+         {{MO_VAR_PARSE 'VAR_FILETYPES_ALLOWED_WILDCARD'}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_FILETYPES_ALLOWED_WILDCARD' 'ARRAY_FILETYPES_DISALLOWED'}}
+         {{#ARRAY_FILETYPES_DISALLOWED}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "allowed" : false,
+               "name" : "{{.}}"
+            }
+         {{/ARRAY_FILETYPES_DISALLOWED}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_FILETYPES_ALLOWED_WILDCARD' 'ARRAY_FILETYPES_DISALLOWED' 'ARRAY_FILETYPES_ALLOWED'}}
+         {{#ARRAY_FILETYPES_ALLOWED}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "allowed" : true,
+               "checkPostDataLength" : true,
+               "postDataLength" : {{MO_CSV_GET_ENTRY {{.}} '1'}},
+               "checkQueryStringLength" : true,
+               "queryStringLength" : {{MO_CSV_GET_ENTRY {{.}} '2'}},
+               "checkRequestLength" : true,
+               "requestLength" : {{MO_CSV_GET_ENTRY {{.}} '3'}},
+               "checkUrlLength" : true,
+               "urlLength" : {{MO_CSV_GET_ENTRY {{.}} '4'}},
+               "name" : "{{MO_CSV_GET_FIRST {{.}}}}",
+               "performStaging" : false,
+               "responseCheck" : {{MO_CSV_GET_ENTRY {{.}} '5'}},
+               "type" : "explicit"
+            }
+         {{/ARRAY_FILETYPES_ALLOWED}}
+      ],
+      "urls" : [
+         {{MO_VAR_PARSE 'VAR_URLS_ALLOWED_WILDCARD'}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_URLS_ALLOWED_WILDCARD' 'ARRAY_URLS_DISALLOWED'}}
+         {{#ARRAY_URLS_DISALLOWED}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "name" : "{{.}}",
+               "type" : "wildcard",
+               "wildcardIncludesSlash" : true,
+               "isAllowed" : false,
+               "method" : "*",
+               "protocol" : "http"
+            }
+         {{/ARRAY_URLS_DISALLOWED}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_URLS_ALLOWED_WILDCARD' 'ARRAY_URLS_DISALLOWED' 'ARRAY_URLS_ALLOWED'}}
+         {{#ARRAY_URLS_ALLOWED}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "name" : "{{MO_CSV_GET_ENTRY {{.}} '1'}}",
+               "disallowFileUploadOfExecutables" : false,
+               "isAllowed" : true,
+               "attackSignaturesCheck" : {{MO_CSV_GET_ENTRY {{.}} '6'}},
+               "mandatoryBody" : false,
+               "metacharsOnUrlCheck" : {{MO_CSV_GET_ENTRY {{.}} '3'}},
+               "method" : "{{MO_CSV_GET_FIRST {{.}}}}",
+               "protocol" : "http"
+               {{MO_URLS_GET_TYPE {{.}}}}
+               {{MO_URLS_GET_CONTENT_PROFILE {{.}}}}
+               ,"signatureOverrides" : [
+                  {{MO_URLS_GET_DISABLED_SIGNATURES {{.}}}}
+               ]
+            }
+         {{/ARRAY_URLS_ALLOWED}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_URLS_ALLOWED_WILDCARD' 'ARRAY_URLS_DISALLOWED' 'ARRAY_URLS_ALLOWED' 'WSDL_URLS'}}
+         {{#WSDL_URLS}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "disallowFileUploadOfExecutables" : false,
+               "isAllowed" : true,
+               "attackSignaturesCheck" : true,
+               "mandatoryBody" : true,
+               "metacharsOnUrlCheck" : true,
+               "method" : "*",
+               "name" : "{{.}}",
+               "protocol" : "http",
+               "type" : "explicit",
+               "urlContentProfiles" : [
+                  {
+                     "contentProfile" : {
+                        "name" : "{{WSDL_GET_PROFILE_NAME {{.}}}}"
+                     },
+                     "headerName" : "Content-Type",
+                     "headerOrder" : "1",
+                     "headerValue" : "*xml*",
+                     "type" : "xml"
+                  },
+                  {
+                     "headerName" : "*",
+                     "headerOrder" : "default",
+                     "headerValue" : "*",
+                     "type" : "disallow"
+                  }
+               ]
+            }
+         {{/WSDL_URLS}}
+      ],
+      "websocket-urls" : [
+         {{MO_VAR_PARSE 'VAR_WEBSOCKET_ALLOWED_WILDCARD'}}
+      ],
+      "parameters" : [
+         {{MO_VAR_PARSE 'VAR_PARAMETERS_ALLOWED_WILDCARD'}}
+         {{MO_COMMA_IF_NOT_EMPTY 'VAR_PARAMETERS_ALLOWED_WILDCARD' 'ARRAY_PARAMETERS_ALLOWED'}}
+         {{#ARRAY_PARAMETERS_ALLOWED}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "name" : "{{MO_CSV_GET_FIRST {{.}}}}",
+               "sensitiveParameter" : {{MO_CSV_GET_ENTRY {{.}} '1'}},
+               "valueType" : "{{MO_CSV_GET_ENTRY {{.}} '3'}}",
+               "dataType" : "{{MO_CSV_GET_ENTRY {{.}} '4'}}",
+               "attackSignaturesCheck" : "{{MO_CSV_GET_ENTRY {{.}} '5'}}",
+               "checkMetachars" : true,
+               "metacharsOnParameterValueCheck" : false,
+               "allowRepeatedParameterName" : true,
+               {{MO_PARAMETERS_GET_VALUE_LENGTH {{.}}}}
+               "signatureOverrides" : [
+                  {{MO_PARAMETERS_GET_DISABLE_SIGNATURES {{.}}}}
+               ]
+            }
+         {{/ARRAY_PARAMETERS_ALLOWED}}
+      ],
+      "whitelist-ips" : [
+         {{#ARRAY_WHITELIST_IPS}}
+            {{MO_COMMA_IF_NOT_FIRST}}
+            {
+               "blockRequests" : "never",
+               "description" : "",
+               "ignoreAnomalies" : true,
+               "ignoreIpReputation" : true,
+               "ipAddress" : "{{MO_CSV_GET_FIRST {{.}}}}",
+               "ipMask" : "{{MO_CSV_GET_LAST {{.}}}}",
+               "neverLearnRequests" : true,
+               "neverLogRequests" : false,
+               "trustedByPolicyBuilder" : false
+            }
+         {{/ARRAY_WHITELIST_IPS}}
+      ],
+      "character-sets" : [
+         {
+            "characterSetType" : "json-content",
+            "characterSet" : [
+               {{MO_PRINT_CHARSET 'ARRAY_JSON_CHARACTERSET'}}
+            ]
+         },
+         {
+            "characterSetType" : "xml-content",
+            "characterSet" : [
+               {{MO_PRINT_CHARSET 'ARRAY_XML_CHARACTERSET'}}
+            ]
+         },
+         {
+            "characterSetType" : "header",
+            "characterSet" : [
+               {{MO_PRINT_CHARSET 'ARRAY_HTTP_HEADER_CHARACTERSET'}}
+            ]
+         },
+         {
+            "characterSetType" : "parameter-name",
+            "characterSet" : [
+               {{MO_PRINT_CHARSET 'ARRAY_PARAMETERS_NAME_CHARACTERSET'}}
+            ]
+         },
+         {
+            "characterSetType" : "url",
+            "characterSet" : [
+               {{MO_PRINT_CHARSET 'ARRAY_URLS_CHARACTERSET'}}
+            ]
+         },
+         {
+            "characterSetType" : "gwt-content",
+            "characterSet" : [
+               {{MO_PRINT_CHARSET 'ARRAY_GWT_CHARACTERSET'}}
+            ]
+         }
+      ]
+   },
+   "modifications": []
+}

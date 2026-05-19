@@ -1,0 +1,2 @@
+# Checking for invalid metacharacters in GraphQL elements (JSON_CHARACTERSET)
+true

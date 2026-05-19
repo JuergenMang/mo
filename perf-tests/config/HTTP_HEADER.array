@@ -1,0 +1,3 @@
+# Settings for specific HTTP headers
+#Header,Mask,allowRepeatedOccurrences
+#Authorization,true,false

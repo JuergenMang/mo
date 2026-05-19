@@ -1,0 +1,58 @@
+# Allows a wildcard URL. Remove content to not allow a wildcard for URLs.
+{
+    "attackSignaturesCheck" : true,
+    "clickjackingProtection" : false,
+    "description" : "",
+    "disallowFileUploadOfExecutables" : false,
+    "html5CrossOriginRequestsEnforcement" : {
+        "enforcementMode" : "disabled"
+    },
+    "isAllowed" : true,
+    "mandatoryBody" : false,
+    "metacharsOnUrlCheck" : {{VAR_URLS_WILDCARD_CHECK_METACHARS}},
+    "method" : "*",
+    "methodsOverrideOnUrlCheck" : false,
+    "name" : "*",
+    "performStaging" : false,
+    "protocol" : "http",
+    "type" : "wildcard",
+    "urlContentProfiles" : [
+        {
+            "headerName" : "*",
+            "headerOrder" : "default",
+            "headerValue" : "*",
+            "type" : "apply-value-and-content-signatures"
+        },
+        {
+            "headerName" : "Content-Type",
+            "headerOrder" : "1",
+            "headerValue" : "*form*",
+            "type" : "form-data"
+        },
+        {
+            "contentProfile" : {
+                "name" : "Default"
+            },
+            "headerName" : "Content-Type",
+            "headerOrder" : "2",
+            "headerValue" : "*json*",
+            "type" : "json"
+        },
+        {
+            "contentProfile" : {
+                "name" : "Default"
+            },
+            "headerName" : "Content-Type",
+            "headerOrder" : "3",
+            "headerValue" : "*xml*",
+            "type" : "xml"
+        },
+        {
+            "headerName" : "Content-Type",
+            "headerOrder" : "4",
+            "headerValue" : "application/dns-message",
+            "type" : "disallow"
+        }
+    ],
+    "wildcardIncludesSlash" : true
+}

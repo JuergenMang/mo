@@ -1,0 +1,2 @@
+# Blocks requests with invalid meta characters in XML elements
+true

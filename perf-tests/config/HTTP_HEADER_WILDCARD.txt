@@ -1,0 +1,71 @@
+# Standard HTTP headers - do not remove
+{
+    "name" : "*",
+    "type" : "wildcard",
+    "allowRepeatedOccurrences" : true,
+    "checkSignatures" : true,
+    "mandatory" : false,
+    "maskValueInLogs" : false,
+    "wildcardOrder" : 1,
+    "percentDecoding" : true
+},
+{
+    "name" : "authorization",
+    "type" : "explicit",
+    "allowRepeatedOccurrences" : false,
+    "base64Decoding" : false,
+    "checkSignatures" : true,
+    "htmlNormalization" : false,
+    "mandatory" : false,
+    "maskValueInLogs" : true,
+    "normalizationViolations" : false,
+    "percentDecoding" : true,
+    "urlNormalization" : false
+},
+{
+    "name" : "cookie",
+    "type" : "explicit",
+    "allowRepeatedOccurrences" : false,
+    "checkSignatures" : false,
+    "mandatory" : false,
+    "maskValueInLogs" : false
+},
+{
+    "name" : "referer",
+    "type" : "explicit",
+    "allowRepeatedOccurrences" : true,
+    "base64Decoding" : false,
+    "checkSignatures" : true,
+    "htmlNormalization" : false,
+    "mandatory" : false,
+    "maskValueInLogs" : false,
+    "normalizationViolations" : true,
+    "percentDecoding" : false,
+    "urlNormalization" : true
+},
+{
+    "name" : "transfer-encoding",
+    "type" : "explicit",
+    "allowRepeatedOccurrences" : false,
+    "base64Decoding" : false,
+    "checkSignatures" : true,
+    "htmlNormalization" : false,
+    "mandatory" : false,
+    "maskValueInLogs" : false,
+    "normalizationViolations" : false,
+    "percentDecoding" : false,
+    "urlNormalization" : false
+},
+{
+    "name" : "content-length",
+    "type" : "explicit",
+    "allowRepeatedOccurrences" : false,
+    "base64Decoding" : false,
+    "checkSignatures" : true,
+    "htmlNormalization" : false,
+    "mandatory" : false,
+    "maskValueInLogs" : false,
+    "normalizationViolations" : false,
+    "percentDecoding" : false,
+    "urlNormalization" : false
+}

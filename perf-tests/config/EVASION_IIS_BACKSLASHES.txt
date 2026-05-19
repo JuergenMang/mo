@@ -1,0 +1,2 @@
+# Normalizes \ to / in requests
+true

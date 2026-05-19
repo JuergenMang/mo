@@ -1,0 +1,4 @@
+# Sensitive data for XML content
+#Name,Type
+#password,Element
+#password,Attribute

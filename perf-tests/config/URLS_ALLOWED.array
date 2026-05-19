@@ -1,0 +1,17 @@
+# Allowed URLs
+#method,url,wildcard,metachar check,content type,content profile,attackSignaturesCheck,disabled signatures
+
+#*,/no-signature-check/*,true,true,,,false,
+#*,/disable-signatures,false,true,,,true,200100108 200100109
+
+# Disable content profile
+#*,/test-without-content-profile,false,true,apply-value-and-content-signatures,Default,true,
+
+# Enforce specific content profile
+#*,/test-xml-default,false,true,xml,Default,true,
+
+# GraphQL endpoint:
+#*,/test-graphql-default,false,true,graphql,Default,true,
+
+# Disable content profile and signature matching
+#*,/test-without,false,true,do-nothing,Default,false,

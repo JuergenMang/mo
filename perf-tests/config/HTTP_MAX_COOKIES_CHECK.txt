@@ -1,0 +1,2 @@
+# Blocks requests with too many cookies (HTTP_MAX_COOKIES)
+true

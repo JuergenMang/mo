@@ -1,0 +1,2 @@
+# Maximum size of a POST body
+52428800

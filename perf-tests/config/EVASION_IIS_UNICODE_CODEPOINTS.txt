@@ -1,0 +1,2 @@
+# Mapping of IIS-specific non-ASCII code points
+true

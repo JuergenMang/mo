@@ -1,0 +1,2 @@
+# Decodes Unicode encodings (%U, %u)
+true

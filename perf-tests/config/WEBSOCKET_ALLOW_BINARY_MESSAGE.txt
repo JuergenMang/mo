@@ -1,0 +1,2 @@
+# Allows binary websocket content
+false

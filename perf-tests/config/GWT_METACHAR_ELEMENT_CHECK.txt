@@ -1,0 +1,2 @@
+# Check for invalid metacharacters in GWT elements
+true

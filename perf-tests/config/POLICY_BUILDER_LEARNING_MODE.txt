@@ -1,0 +1,3 @@
+# Learning mode of the policy builder
+manual
+#disabled

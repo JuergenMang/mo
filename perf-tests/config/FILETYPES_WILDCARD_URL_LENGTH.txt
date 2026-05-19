@@ -1,0 +1,2 @@
+# Maximum length of a URL, the maximum is 2048.
+1024

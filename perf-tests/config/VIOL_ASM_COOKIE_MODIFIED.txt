@@ -1,0 +1,2 @@
+# Blocks requests with modified ASM cookies
+true

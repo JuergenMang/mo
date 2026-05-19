@@ -1,0 +1,2 @@
+# Maximum number of batched queries
+100

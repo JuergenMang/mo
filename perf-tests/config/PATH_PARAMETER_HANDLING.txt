@@ -1,0 +1,5 @@
+# Treat URL paths as parameters
+# For regular websites
+ignore
+# For REST API
+#as-url

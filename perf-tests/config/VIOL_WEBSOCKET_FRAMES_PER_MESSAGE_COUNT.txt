@@ -1,0 +1,2 @@
+# Blocks websocket messages with too many frames
+true

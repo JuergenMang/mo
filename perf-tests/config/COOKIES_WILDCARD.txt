@@ -1,0 +1,14 @@
+# Template for the wildcard cookie (must exist)
+{
+    "name" : "*",
+    "accessibleOnlyThroughTheHttpProtocol" : {{VAR_COOKIES_WILDCARD_HTTPONLY}},
+    "attackSignaturesCheck" : true,
+    "enforcementType" : "allow",
+    "insertSameSiteAttribute" : "{{VAR_COOKIES_WILDCARD_SAMESITE}}",
+    "isBase64" : false,
+    "maskValueInLogs" : {{VAR_COOKIES_WILDCARD_MASK}},
+    "performStaging" : false,
+    "securedOverHttpsConnection" : true,
+    "type" : "wildcard",
+    "wildcardOrder" : 1
+}

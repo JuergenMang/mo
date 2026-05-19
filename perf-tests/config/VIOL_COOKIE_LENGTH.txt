@@ -1,0 +1,2 @@
+# Blocks requests with cookies that are too large
+true

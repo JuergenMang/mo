@@ -1,0 +1,2 @@
+# Blocks URIs and parameters that have been URL-encoded more than 3 times
+true

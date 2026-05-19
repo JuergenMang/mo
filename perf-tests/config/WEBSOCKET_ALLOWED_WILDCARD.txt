@@ -1,0 +1,33 @@
+# Wildcard URL for websockets
+{
+    "name" : "*",
+    "protocol" : "ws",
+    "type" : "wildcard",
+    "allowBinaryMessage" : {{VAR_WEBSOCKET_ALLOW_BINARY_MESSAGE}},
+    "allowJsonMessage" : true,
+    "allowTextMessage" : true,
+    "checkBinaryMessageMaxSize" : true,
+    "binaryMessageMaxSize" : {{VAR_WEBSOCKET_BINARY_MESSAGE_MAX_SIZE}},
+    "checkMessageFrameMaxCount" : true,
+    "messageFrameMaxCount" : {{VAR_WEBSOCKET_WILDCARD_MESSAGE_FRAME_MAX_COUNT}},
+    "checkMessageFrameMaxSize" : true,
+    "messageFrameMaxSize" : {{VAR_WEBSOCKET_WILDCARD_MESSAGE_FRAME_MAX_SIZE}},
+    "checkPayload" : true,
+    "description" : "",
+    "html5CrossOriginRequestsEnforcement" : {
+        "enforcementMode" : "enforce"
+    },
+    "isAllowed" : true,
+    "jsonProfile" : {
+        "name" : "Default"
+    },
+    "metacharsOnWebsocketUrlCheck" : {{VAR_WEBSOCKET_WILDCARD_METACHAR_URL_CHECK}},
+    "performStaging" : false,
+    "plainTextProfile" : {
+        "name" : "Default"
+    },
+    "unsupportedExtensions" : "remove",
+    "wildcardIncludesSlash" : true,
+    "wildcardOrder" : 1,
+    "attackSignaturesCheck" : true
+}

@@ -1,0 +1,2 @@
+# Blocks headers that must not occur multiple times
+true

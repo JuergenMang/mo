@@ -1,0 +1,2 @@
+# Blocks introspection queries
+true

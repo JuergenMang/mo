@@ -1,0 +1,11 @@
+# XML response body for blocking, must be a valid json string
+<?xml version='1.0' encoding='utf-8'?>
+<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>
+  <soap:Body>
+    <soap:Fault>
+      <faultcode>soap:Client</faultcode>
+      <faultstring>The requested operation was rejected. Please consult with your administrator.Your support ID is: <%TS.request.ID()%></faultstring>
+      <detail/>
+    </soap:Fault>
+  </soap:Body><
+</soap:Envelope>

@@ -1,0 +1,2 @@
+# Maximum size for the plain text content profile
+"any"

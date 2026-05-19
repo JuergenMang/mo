@@ -1,0 +1,2 @@
+# Cookie was modified on the client side (cookie must be configured as "enforced").
+true

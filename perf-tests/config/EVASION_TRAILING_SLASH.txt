@@ -1,0 +1,2 @@
+# Blocks URLs ending with a slash
+false

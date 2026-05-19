@@ -1,0 +1,2 @@
+# Maximum size of binary websocket content
+10000

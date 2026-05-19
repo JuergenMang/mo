@@ -1,0 +1,3 @@
+# Maximum size of XML attribute values for the default XML content profile
+4096
+#"any"

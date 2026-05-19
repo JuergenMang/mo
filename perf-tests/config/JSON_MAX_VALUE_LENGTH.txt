@@ -1,0 +1,3 @@
+# Maximum size of a JSON value for the JSON content profile
+262144
+#"any"

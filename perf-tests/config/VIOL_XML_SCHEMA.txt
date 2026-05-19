@@ -1,0 +1,2 @@
+# Enables blocking for XML schema validation
+true

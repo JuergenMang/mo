@@ -1,0 +1,10 @@
+# Disallowed wildcard URLs (e.g. /admin/*)
+/server-status*
+/.git/*
+/dns-query*
+/log/*
+/logs/*
+/phpinfo.php
+/metrics/*
+/actuator/heapdump
+/heapdump

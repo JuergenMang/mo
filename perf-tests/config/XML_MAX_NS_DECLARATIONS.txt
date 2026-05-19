@@ -1,0 +1,3 @@
+# Maximum number of namespace declarations for the default XML content profile
+256
+#"any"
