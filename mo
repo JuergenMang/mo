@@ -248,7 +248,7 @@ mo::debugShowState() {
     moState="$moState  standalone: $moTemp"
     moTemp=${MO_CURRENT@Q}
     moState="$moState  current: $moTemp"
-    moIndex=$((${#MO_PARSED} - 20))
+    (( moIndex = ${#MO_PARSED} - 20 )) || true
     moDots=...
 
     if (( moIndex < 0 )); then
@@ -797,8 +797,6 @@ mo::parsePartial() {
 #
 # Returns nothing
 mo::parseComment() {
-    local moContent moContent
-
     MO_UNPARSED=${MO_UNPARSED#*"$MO_CLOSE_DELIMITER"}
     mo::debug "Parsing comment"
 
@@ -1013,7 +1011,7 @@ mo::evaluate() {
                 moType=$1
                 moValue=$2
                 mo::debug "Combining $moValue tokens"
-                moIndex=$((${#moStack[@]} - (2 * moValue)))
+                (( moIndex = ${#moStack[@]} - (2 * moValue) )) || true
                 mo::evaluateListOfSingles moCombined "${moStack[@]:$moIndex}"
 
                 if [[ "$moType" == "PAREN" ]]; then
@@ -1144,7 +1142,8 @@ mo::evaluateVariable() {
     if [[ -z "${moNameParts[1]}" ]]; then
         if mo::isArray "${moNameParts[0]}"; then
             local -n arrayRef=${moNameParts[0]}
-            mo::join moResult "," "${arrayRef[@]}"
+            local IFS=,
+            printf -v moResult '%s' "${arrayRef[*]}"
         else
             if declare -p "${moNameParts[0]}" &> /dev/null; then
                 local -n varRef=${moNameParts[0]}
@@ -1229,23 +1228,6 @@ mo::findVariableName() {
     fi
 
     local "$1" && mo::indirectArray "$1" "$moResultBase" "$moResultIndex"
-}
-
-
-# Internal: Join / implode an array
-#
-# $1    - Variable name to receive the joined content
-# $2    - Joiner
-# $3-@ - Elements to join
-#
-# Returns nothing.
-mo::join() {
-    local target joiner
-    target=$1
-    joiner=$2
-    shift 2
-    local IFS="$joiner"
-    printf -v "$target" '%s' "$*"
 }
 
 
@@ -1340,13 +1322,13 @@ mo::standaloneProcess() {
     local moI moTemp moChar
 
     mo::debug "Standalone tag - processing content before and after tag"
-    moI=$((${#MO_PARSED} - 1))
+    (( moI = ${#MO_PARSED} - 1 )) || true
     mo::debug "zero done ${#MO_PARSED}"
     moTemp="${MO_PARSED@Q}"
     mo::debug "$moTemp"
 
     while moChar="${MO_PARSED:$moI:1}" && [[ "$moChar" == " " || "$moChar" == $'\t' ]]; do
-        moI=$((moI - 1))
+        (( moI = moI - 1 )) || true
     done
 
     if [[ $((moI + 1)) != "${#MO_PARSED}" ]]; then
@@ -1356,17 +1338,17 @@ mo::standaloneProcess() {
     moI=0
 
     while moChar="${MO_UNPARSED:${moI}:1}" && [[ "$moChar" == " " || "$moChar" == $'\t' ]]; do
-        moI=$((moI + 1))
+        (( moI = moI + 1 )) || true
     done
 
     moChar="${MO_UNPARSED:${moI}:1}"
     if [[ "$moChar" == $'\r' ]]; then
-        moI=$((moI + 1))
+        (( moI = moI + 1 )) || true
         moChar="${MO_UNPARSED:${moI}:1}"
     fi
 
     if [[ "$moChar" == $'\n' ]]; then
-        moI=$((moI + 1))
+        (( moI = moI + 1 )) || true
     fi
 
     if [[ "$moI" != 0 ]]; then
@@ -1743,7 +1725,7 @@ mo::tokenizeTagContents() {
         esac
 
         mo::debug "Got chunk: ${moTemp[0]} ${moTemp[1]}"
-        moTokenCount=$((moTokenCount + 1))
+        (( moTokenCount = moTokenCount + 1 )) || true
     done
 }
 
