@@ -225,7 +225,7 @@ mo() (
 #
 # Returns nothing.
 mo::debug() {
-    [[ -z ${MO_DEBUG-} ]] && return
+    [[ -z "${MO_DEBUG-}" ]] && return
     echo "DEBUG ${FUNCNAME[1]:-?} - $1" >&2
 }
 
@@ -954,24 +954,6 @@ mo::isArrayIndexValid() {
 }
 
 
-# Internal: Determine if a variable is assigned, even if it is assigned an empty
-# value.
-#
-# $1 - Variable name to check.
-#
-# Can not use logic like this in case invalid variable names are passed.
-#     [[ "${!1-a}" == "${!1-b}" ]]
-#
-# Returns true (0) if the variable is set, 1 if the variable is unset.
-mo::isVarSet() {
-    if ! declare -p "$1" &> /dev/null; then
-        return 1
-    fi
-
-    return 0
-}
-
-
 # Internal: Determine if a value is considered truthy.
 #
 # $1 - The value to test
@@ -1163,7 +1145,7 @@ mo::evaluateVariable() {
             local -n arrayRef=${moNameParts[0]}
             mo::join moResult "," "${arrayRef[@]}"
         else
-            if mo::isVarSet "${moNameParts[0]}"; then
+            if declare -p "${moNameParts[0]}" &> /dev/null; then
                 local -n varRef=${moNameParts[0]}
                 if [[ -z "${varRef-}" ]]; then
                     moResult=""
