@@ -439,12 +439,7 @@ mo::trimUnparsed() {
 #
 # Returns nothing.
 mo::chomp() {
-    #: Use single pattern substitution for faster processing in Bash 5
-    #local moTemp=${2%%[[:space:]]*}
-    #local "$1" && mo::indirect "$1" "$moTemp"
-
-    local -n out=$1
-    out=${2%%[[:space:]]*}
+    printf -v "$1" '%s' "${2%%[[:space:]]*}"
 }
 
 
@@ -1327,8 +1322,8 @@ mo::standaloneProcess() {
     moTemp="${MO_PARSED@Q}"
     mo::debug "$moTemp"
 
-    while moChar="${MO_PARSED:$moI:1}" && [[ "$moChar" == " " || "$moChar" == $'\t' ]]; do
-        (( moI = moI - 1 )) || true
+    while [[ ${MO_PARSED:moI:1} == ' ' || ${MO_PARSED:moI:1} == $'\t' ]]; do
+        (( moI-- )) || true
     done
 
     if [[ $((moI + 1)) != "${#MO_PARSED}" ]]; then
@@ -1337,18 +1332,18 @@ mo::standaloneProcess() {
 
     moI=0
 
-    while moChar="${MO_UNPARSED:${moI}:1}" && [[ "$moChar" == " " || "$moChar" == $'\t' ]]; do
-        (( moI = moI + 1 )) || true
+    while [[ ${MO_UNPARSED:moI:1} == ' ' || ${MO_UNPARSED:moI:1} == $'\t' ]]; do
+        (( moI++ )) || true
     done
 
     moChar="${MO_UNPARSED:${moI}:1}"
     if [[ "$moChar" == $'\r' ]]; then
-        (( moI = moI + 1 )) || true
+        (( moI++ )) || true
         moChar="${MO_UNPARSED:${moI}:1}"
     fi
 
     if [[ "$moChar" == $'\n' ]]; then
-        (( moI = moI + 1 )) || true
+        (( moI++ )) || true
     fi
 
     if [[ "$moI" != 0 ]]; then
