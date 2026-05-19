@@ -128,7 +128,7 @@ mo() (
             if $moDoubleHyphens; then
                 #: After we encounter two hyphens together, all the rest
                 #: of the arguments are files.
-                moFiles=(${moFiles[@]+"${moFiles[@]}"} "$arg")
+                moFiles+=("$arg")
             else
                 case "$arg" in
                     -h|--h|--he|--hel|--help|-\?)
@@ -203,7 +203,7 @@ mo() (
 
                     *)
                         #: Every arg that is not a flag or a option should be a file
-                        moFiles=(${moFiles[@]+"${moFiles[@]}"} "$arg")
+                        moFiles+=("$arg")
                         ;;
                 esac
             fi
@@ -213,7 +213,7 @@ mo() (
     mo::debug "Debug enabled"
     MO_OPEN_DELIMITER="$MO_OPEN_DELIMITER_DEFAULT"
     MO_CLOSE_DELIMITER="$MO_CLOSE_DELIMITER_DEFAULT"
-    mo::content moContent ${moFiles[@]+"${moFiles[@]}"} || return 1
+    mo::content moContent "${moFiles[@]}" || return 1
     mo::parse moParsed "$moContent"
     printf '%s' "$moParsed"
 )
@@ -1042,7 +1042,7 @@ mo::evaluate() {
                 ;;
 
             *)
-                moStack=(${moStack[@]+"${moStack[@]}"} "$1" "$2")
+                moStack+=("$1" "$2")
                 ;;
         esac
 
@@ -1058,7 +1058,7 @@ mo::evaluate() {
     else
         #: Concatenate
         mo::debug "Concatenating ${#moStack[@]} stack items"
-        mo::evaluateListOfSingles moResult ${moStack[@]+"${moStack[@]}"}
+        mo::evaluateListOfSingles moResult "${moStack[@]}"
     fi
 
     local "$moTarget" && mo::indirect "$moTarget" "$moResult"
@@ -1734,7 +1734,7 @@ mo::tokenizeTagContents() {
 
             "$moTerminator"*)
                 mo::debug "Found terminator"
-                local "$1" && mo::indirectArray "$1" "$moTokenCount" ${moResult[@]+"${moResult[@]}"}
+                local "$1" && mo::indirectArray "$1" "$moTokenCount" "${moResult[@]}"
                 return
                 ;;
 
