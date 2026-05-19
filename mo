@@ -1916,6 +1916,11 @@ mo::tokenizeTagContentsSingleQuote() {
 MO_ORIGINAL_COMMAND="$(cd "${BASH_SOURCE[0]%/*}" || exit 1; pwd)/${BASH_SOURCE[0]##*/}"
 MO_VERSION="5.0.0"
 
+if [[ "${BASH_VERSINFO[0]}" -lt 5 ]]; then
+    echo "This MO version is only compatible with Bash 5 or newer."
+    exit 1
+fi
+
 # If sourced, load all functions.
 # If executed, perform the actions as expected.
 if [[ "$0" == "${BASH_SOURCE[0]}" ]] || [[ -z "${BASH_SOURCE[0]}" ]]; then
