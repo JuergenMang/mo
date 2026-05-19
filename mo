@@ -291,11 +291,9 @@ mo::error() {
 #
 # Returns nothing. Exits the program.
 mo::errorNear() {
-    local moEscaped
-
-    mo::escape moEscaped "${2:0:40}"
+    local moContext="${2:0:40}"
     echo "ERROR: $1" >&2
-    echo "ERROR STARTS NEAR: $moEscaped"
+    echo "ERROR STARTS NEAR: ${moContext@Q}"
     exit "${3:-1}"
 }
 
@@ -442,8 +440,11 @@ mo::trimUnparsed() {
 # Returns nothing.
 mo::chomp() {
     #: Use single pattern substitution for faster processing in Bash 5
-    local moTemp=${2%%[[:space:]]*}
-    local "$1" && mo::indirect "$1" "$moTemp"
+    #local moTemp=${2%%[[:space:]]*}
+    #local "$1" && mo::indirect "$1" "$moTemp"
+
+    local -n out=$1
+    out=${2%%[[:space:]]*}
 }
 
 
@@ -1341,7 +1342,7 @@ mo::standaloneProcess() {
     mo::debug "Standalone tag - processing content before and after tag"
     moI=$((${#MO_PARSED} - 1))
     mo::debug "zero done ${#MO_PARSED}"
-    mo::escape moTemp "$MO_PARSED"
+    moTemp="${MO_PARSED@Q}"
     mo::debug "$moTemp"
 
     while moChar="${MO_PARSED:$moI:1}" && [[ "$moChar" == " " || "$moChar" == $'\t' ]]; do
@@ -1424,20 +1425,6 @@ mo::indentLines() {
 
     #local "$1" && mo::indirect "$1" "$moResult"
     printf -v "$1" '%s' "$moResult"
-}
-
-
-# Internal: Escape a value
-#
-# $1 - Destination variable name
-# $2 - Value to escape
-#
-# Returns nothing
-mo::escape() {
-    local moResult
-    moResult=$2
-    moResult=${moResult@Q} 
-    local "$1" && mo::indirect "$1" "$moResult"
 }
 
 
